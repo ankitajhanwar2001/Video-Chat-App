@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Video Chat App</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <script>
+      const ROOM_ID = "<%= roomId %>";
+    </script>
+
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script src="https://unpkg.com/peerjs@1.2.0/dist/peerjs.min.js"></script>
+    <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script> <!-- For rendering templates -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script> <!-- For formatting time -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script> <!-- For parsing our query string -->
+    <!-- <script defer src="https://unpkg.com/peerjs@1.2.0/dist/peerjs.min.js"></script> -->
+    <script src="script.js" defer></script>
+    
+  </head>
+  <body>
+     
+    <div class="header">
+      <div class="logo">
+        <h3>Video Chat</h2>
+      </div>
+    </div>  
+
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">x</span>
+        <p>Invite people:</p>
+        <input type="text" name="link" value="" id="myURL"><br><br>
+        <input type="text" name="code" value="" id="myCode"><br><br>
+        <span style="align-content: center;">
+          <button id="copyLinkBtn" onclick="copyLink()">Copy Link</button>
+          <button id="copyCodeBtn" onclick="copyCode()">Copy code</button>
+        </span>
+      </div>
+    </div>
+
+    <div id="myUserModal" class="Usermodal">
+      <div class="user-modal-content">
+        <span class="close-span">x</span>
+        <p>User data:</p>
+        <!-- <input type="text" name="link" value="" id="myURL"><br><br>
+        <input type="text" name="code" value="" id="myCode"><br><br> -->
+        <span style="align-content: center;">
+          <button id="user-profile" onclick="UserProfile(this)"></button>
+          <button id="user-mute" onclick="MuteAlert(this)"></button>
+          <button id="user-video" onclick="VideoAlert(this)"></button>
+        </span>
+      </div>
+    </div>
+
+    <div class="main">  
+    <div class="main__left" style="display: flex; flex: 1;">
+      <div class="videos__group">
+        <div id="my-video-grid" class="video-here">
+            
+        </div>
+        <div id="video-grid" class="video-here">
+
+          <div id="photo-grid" style="display: none;">
+            <img id="no-photo" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
+          </div>
+        </div>
+      </div>
+      <div class="options">
+        
+        <div class="options__left">
+          <div id="stopVideo" class="options__button" onclick="onoffVideo()">
+            <i class="fa fa-video-camera"></i>
+          </div>
+          <div id="muteButton" class="options__button" onclick="onoffVoice()">
+            <i class="fa fa-microphone"></i>
+          </div>
+        </div>
+        <div id="cutButton" class="options__button" onclick="leave()">
+            <i style="font-size:24px; transform: rotate(225deg);" class="fa fa-phone"></i>
+        </div>
+        <div class="options__right">
+          <div onclick="showChat()" id="chatButton" class="options__button">
+            <i class='fas fa-comments'></i>
+          </div>
+          <div id="inviteButton" class="options__button" onclick="invite(this)">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div id="participantsButton" class="options__button" onclick="participants(this)">
+            <i class="fa fa-users fa-2" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% var count=0; %>
+    <div class="main__right__right" id="main-participants" style="display: none; flex: 0;">
+      <div class="main__chat_window">
+          <h2 style="color: white;">Participants:</h2>
+          <div id="trialdiv">
+            <li><a onclick="blah(this)" id= '<% count++; %> '>  </a></li>
+          </div>
+          <input type="text" id="search-names" onkeyup="searchNames()" placeholder="Search for names.." title="Type in a name">
+          <div class="messages" id="NoOfparticipants">
+
+              <!-- <div id='user-content' class="dropdown-content">
+                <a onclick="UserProfile(this)" href="#">nothing profile</a>
+                <a onclick="MuteAlert(this)" href="#">Ask nothing to mute</a>
+                <a onclick="VideoAlert(this)" href="#">Ask nothing to turn video off</a>
+              </div> -->
+          </div>
+      </div>
+    </div>
+
+    <div class="main__right" id="main-chat" style="display: none; flex: 0;">
+      <div class="main__chat_window">
+          <div class="messages" id="sending-messages">
+
+          </div>
+      </div>
+      <div class="main__message_container" id="message-container">
+        <form id="message-form">
+            <input style="width: 23vw; height: 5vh;" type="text" name="message" placeholder="Message" autocomplete="off">
+            <button style="width: 3vw; height: 2vw" type="submit" id="submitBtn">Send</button>
+        </form>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <script id="message-template" type="text/html">
+    <div>
+      <p>
+          <span>{{username}}</span>     
+          <span style="padding-left: 20%;">{{createdAt}}</span>
+      </p>
+      <p>{{message}}</p>
+    </div>
+  </script>
+ <!-- Traverese the array from beginning -->
+<script id="participants-template" type="text/html">
+    <div>
+        <ul id="names-of-participants">
+            {{#users}}   
+              <li><a onclick="User(this)" id="dropBtn"> {{ firstname }} {{ lastname }} </a></li>
+            {{/users}}
+        </ul>
+    </div>   
+</script>
+
+  </body>
+  
+</html>

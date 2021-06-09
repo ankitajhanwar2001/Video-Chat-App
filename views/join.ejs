@@ -1,0 +1,13 @@
+<%- include("partials/header") %>
+
+<form action='/join' method="POST">
+    <!-- <input type="text" name="room" placeholder="Create a new meeting"> -->
+    <button>Create a new meeting</button>
+</form>
+
+<form action='/joinExisting' method="POST">
+    <input type="text" name="existingRoom" placeholder="Join a meeting">
+    <button>Join</button>
+</form>
+
+<%- include("partials/footer") %>
