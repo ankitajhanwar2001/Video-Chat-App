@@ -73,6 +73,8 @@ navigator.mediaDevices.getUserMedia({
 })
 
 socket.on('no-of-participants', function({ room, users }) {
+    console.log(users);
+    // users
     const html = Mustache.render(participantsTemplate, {
         room,
         users
@@ -347,7 +349,7 @@ var Uservideo = document.getElementById("user-video");
 function UserProfile(e) {
     // console.log(e);
     console.log(userdata);
-    var user = userdata.username
+    var user = userdata;
     // .substring(1);
     // user = user.substring(0,user.indexOf(' '));
     // socket.emit('sending-to-user', ROOM_ID, e.text);
@@ -357,59 +359,36 @@ function UserProfile(e) {
 
 function MuteAlert(e) {
     // console.log(e.text);
-    var user = userdata.username
+    var user = userdata;
     // .substring(userdata.text.indexOf(' ')+1);
     // user = user.split(" ")[0];
     socket.emit('sending-to-user', ROOM_ID, user, 'Kindly mute yourself');
 }
 
-function VideoAlert(e) {
-    // console.log(e);
-    var user = userdata.username
-    // .substring(userdata.text.indexOf(' ')+1);
-    // user = user.split(" ")[0];
-    socket.emit('sending-to-user', ROOM_ID, user, 'Kindly turn off your video');
-}
+// function VideoAlert(e) {
+//     // console.log(e);
+//     var user = userdata;
+//     // .substring(userdata.text.indexOf(' ')+1);
+//     // user = user.split(" ")[0];
+//     socket.emit('sending-to-user', ROOM_ID, user, 'Kindly turn off your video');
+// }
 
 /* When the user clicks on the button, toggle between hiding and showing the dropdown content */
-// function User(e) {
-//   document.getElementById('user-content').classList.toggle("show");
-// }
-
-
-
-// function invite(e) {
-//     link.value = e.baseURI;
-//     code.value = ROOM_ID;
-//     modal.style.display = "block";
-// }
-
 
 function User(e) {
-    socket.emit('get-username', e.text);
-    // userdata = e;
-    var username = e.text;
+    // socket.emit('get-username', e.text);
+    
+    console.log(e.text);
+    var user = e.text.split(' ');
+    userdata = user[3];
+    // console.log(user);
+    var username = user[1] + " " + user[2];
     document.getElementById('user-profile').textContent = username + ' Profile';
     document.getElementById('user-mute').textContent = 'Ask ' + username + ' to mute';
-    document.getElementById('user-video').textContent = 'Ask ' + username + ' to turn video off';
+    // document.getElementById('user-video').textContent = 'Ask ' + username + ' to turn video off';
     Usermodal.style.display = "block";
 }
 
 close.onclick = function() {
     Usermodal.style.display = "none";
 }
-
-// Close the dropdown if the user clicks outside of it
-// window.onclick = function(event) {
-//     console.log(event);
-//   if (!event.target.matches('#dropBtn')) {
-//     var dropdowns = document.getElementsByClassName("dropdown-content");
-//     var i;
-//     for (i = 0; i < dropdowns.length; i++) {
-//       var openDropdown = dropdowns[i];
-//       if (openDropdown.classList.contains('show')) {
-//         openDropdown.classList.remove('show');
-//       }
-//     }
-//   }
-// }

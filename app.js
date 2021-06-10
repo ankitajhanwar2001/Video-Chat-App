@@ -29,8 +29,36 @@ app.use(require('express-session')({
     resave: false,
     saveUninitialize: false
 }));
+//mongodb+srv://VideoChatApp:SumanSunil@303@videochatapp.1cvrt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority     mongodb+srv://VideoChatApp:SumanSunil@303@videochatapp.1cvrt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+// mongoose.connect("mongodb://localhost/video_chat", function(req,res) {
+//     console.log('Database connected');
+// });
 
-mongoose.connect("mongodb://localhost/video_chat");
+mongoose.connect("mongodb+srv://video-chat-app:ankita2001@cluster0.hgets.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",function(res,req){
+   console.log("Database Connected");
+ });
+
+
+// const MongoClient = require('mongodb').MongoClient;
+// const uri = "mongodb+srv://VideoChatApp:SumanSunil@303@videochatapp.1cvrt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+// client.connect(err => {
+//   const collection = client.db("test").collection("devices");
+//   // perform actions on the collection object
+//   client.close();
+// });
+
+
+// const MongoClient = require('mongodb').MongoClient;
+// const uri = "mongodb+srv://ankitajhanwar:SumanSunil@303@videochatapp.zajvp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+// client.connect(err => {
+//   const collection = client.db("test").collection("devices");
+//   // perform actions on the collection object
+//   client.close();
+// });
+
+
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded('extended: true'));
 app.use(methodOverride('_method'));
@@ -245,23 +273,23 @@ io.on('connection', function(socket) {
             users: getUserInRoom(roomId)
         }) 
 
-        socket.on('get-username', function(username) {
-            console.log(username);
-            var user = username.substring(1);
-            // user = user.substring(0,user.indexOf(' '));
-            user = user.split(' ');
-            console.log(user);
-            // username = username.trim();
-            User.find({ firstname: user[0], lastname: user[1] }, function(err, user) {
-                if(err) {
-                    console.log('error');
-                } else {
-                    // var name = user[0] + " " + user[1];
-                    console.log(user);
-                    socket.emit('update-user-name', user[0]);
-                }
-            })
-        })
+        // socket.on('get-username', function(username) {
+        //     console.log(username);
+        //     var user = username.substring(1);
+        //     // user = user.substring(0,user.indexOf(' '));
+        //     user = user.split(' ');
+        //     console.log(user);
+        //     // username = username.trim();
+        //     User.find({ firstname: user[0], lastname: user[1] }, function(err, user) {
+        //         if(err) {
+        //             console.log('error');
+        //         } else {
+        //             // var name = user[0] + " " + user[1];
+        //             console.log(user);
+        //             socket.emit('update-user-name', user[0]);
+        //         }
+        //     })
+        // })
 
         socket.on('disconnect', function() {
             // console.log(io.sockets.adapter.rooms.get(roomId).size);
