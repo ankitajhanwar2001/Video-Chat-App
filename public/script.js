@@ -29,7 +29,7 @@ const myPeer = new Peer(undefined, {
     // host: 'localhost',
     path: '/peerjs',
     host: '/',
-    port: '8080'
+    port: '443'
 })
 
 var myVideo = document.createElement('video');
@@ -74,7 +74,6 @@ navigator.mediaDevices.getUserMedia({
 
 socket.on('no-of-participants', function({ room, users }) {
     console.log(users);
-    // users
     const html = Mustache.render(participantsTemplate, {
         room,
         users
@@ -95,9 +94,9 @@ socket.on('alert-message', function(message) {
     alert(message);
 })
 
-socket.on('update-user-name', function(user) {
-    userdata = user;
-})
+// socket.on('update-user-name', function(user) {
+//     userdata = user;
+// })
 
 socket.on('user-disconnected', userId => {
     if(peers[userId])

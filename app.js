@@ -271,7 +271,7 @@ io.on('connection', function(socket) {
         io.to(roomId).emit('no-of-participants', {
             room: roomId,
             users: getUserInRoom(roomId)
-        }) 
+        })
 
         // socket.on('get-username', function(username) {
         //     console.log(username);
