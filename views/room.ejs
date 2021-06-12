@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <title>Video Chat App</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css"/>
 
     <script>
       const ROOM_ID = "<%= roomId %>";
@@ -14,77 +14,313 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script> <!-- For rendering templates -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script> <!-- For formatting time -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script> <!-- For parsing our query string -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+    <!-- <script src="https://kit.fontawesome.com/c939d0e917.js"></script> -->
     <!-- <script defer src="https://unpkg.com/peerjs@1.2.0/dist/peerjs.min.js"></script> -->
     <script src="script.js" defer></script>
-    
+
+<!--    <style>
+    body {
+      font-family: "Lato", sans-serif;
+      background-image:url(https://wallpapercave.com/wp/bYp71HX.jpg);
+      overflow-y: hidden;
+      overflow-x: hidden;
+    }
+
+    .right-sidenav {
+      height: 100%;
+      width: 300px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      right: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+
+    .right-sidenav a {
+      padding: 6px 8px 6px 16px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+    }
+
+    .right-sidenav a:hover {
+      color: #f1f1f1;
+    }
+
+    .left-sidenav {
+      height: 100%;
+      width: 80px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+
+    .left-sidenav a {
+      padding: 6px 8px 6px 16px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+    }
+
+    .left-sidenav a:hover {
+      color: #f1f1f1;
+    }
+
+    .main {
+      margin-left: 160px;
+      font-size: 28px;
+      padding: 0px 10px;
+    }
+
+    @media screen and (max-height: 450px) {
+      .left-sidenav {padding-top: 15px;}
+      .left-sidenav a {font-size: 18px;}
+      .right-sidenav {padding-top: 15px;}
+      .right-sidenav a {font-size: 18px;}
+    }
+
+    /* .btn {
+      background-color: black;
+      border: none;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      border-radius: 50%;
+    } */
+
+    </style>
+
   </head>
   <body>
-     
-    <div class="header">
-      <div class="logo">
-        <h3>Video Chat</h2>
+
+    <div class="left-sidenav">
+      <a href="#" style="height: 100px;"><img src="css/videoicon.png" alt="" style="width: 5vw; right: 0; position: fixed; left: 1px; float: right;"></a>
+      <div class="btn" style="background-color: black; font-size: 20px;"></div>
+      <a href="#"><i class="fa fa-home" aria-hidden="true" style="color: green; font-size: 30px;"></i></a>
+    </div>
+
+    Right Side Navbar
+    <div class="right-sidenav">
+    </div>
+
+  Bottom Navbar
+  <nav style="width: 80.45%;" class="navbar navbar-inverse navbar-fixed-bottom">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">WebSiteName</a>
       </div>
-    </div>  
+      <ul class="nav navbar-nav">
+         <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">Page 1</a></li>
+        <li><a href="#">Page 2</a></li>
+        <li><a href="#">Page 3</a></li> -->
+      <!-- </ul>
+    </div>
+  </nav> -->
+
+  <!-- Top Navbar -->
+  <!-- <nav class="navbar navbar-inverse" style="position: fixed; right: 0; z-index: 1030; width: 94.825%;">
+    <div class="container-fluid">
+      <div class="navbar-header">
+         <a class="navbar-brand" href="#">WebSiteName</a>
+       </div>
+      <ul class="nav navbar-nav">
+         <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">Page 1</a></li>
+        <li><a href="#">Page 2</a></li>
+        <li><a href="#">Page 3</a></li>
+      </ul>
+    </div>
+  </nav>-->
+
+  <style>
+  .left-sidenav {
+    height: 100%;
+    width: 80px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111111a8;
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
+
+  .left-sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+  }
+
+  .left-sidenav a:hover {
+    color: #f1f1f1;
+  }
+
+.ul-names {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: #f1f1f1;
+  width: 21%;
+  position: fixed;
+  left: 73%;
+  border-radius: 6px;
+}
+
+#names a {
+  display: block;
+  color: #000;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color on hover */
+#names a:hover {
+  background-color: #555;
+  color: white;
+}
+
+  </style>
+
+  <!-- <div class="left-sidenav"> -->
+    <!-- <a href="#" style="height: 100px;"><img src="css/videoicon.png" alt="" style="width: 5vw; right: 0; position: fixed; left: 1px; float: right;"></a> -->
+    <!-- <div class="btn" style="background-color: black; font-size: 20px;"></div> -->
+    <!-- <a href="#"><i class="fa fa-home" aria-hidden="true" style="color: green; font-size: 30px;"></i></a>
+  </div> -->
+
+  <!-- <nav class="navbar navbar-inverse" style="position: fixed; right: 0; z-index: 1030; width: 94.825%;">
+    <div class="container-fluid">
+      <div class="navbar-header">
+         <a class="navbar-brand" href="#">WebSiteName</a>
+       </div>
+      <ul class="nav navbar-nav">
+         <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">Page 1</a></li>
+        <li><a href="#">Page 2</a></li>
+        <li><a href="#">Page 3</a></li>
+      </ul>
+    </div>
+  </nav> -->
+
+    <div class="header">
+      <div class="logo" style="left: 90px; position: fixed;">
+        <!-- <a href="#">Video Chat</a> -->
+        <h4 style="color: white;">Video Chat App</h4>
+        <!-- <i class='far fa-user-circle' style="color: white; position: fixed; right: 45px; font-size: 30px; top: 10px;"></i> -->
+ <!-- class="dropbtn" -->
+        <div class="dropdown" style="color: white; position: fixed; right: 45px; font-size: 30px; top: 10px;">
+          <i class='far fa-user-circle' id="dropbtn"></i>
+          <div class="dropdown-content">
+            <a href="#">Profile</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
 
     <div id="myModal" class="modal">
-      <div class="modal-content">
+      <div class="modal-content" style="position: fixed; left: 33%; right: 33%;">
         <span class="close">x</span>
         <p>Invite people:</p>
         <input type="text" name="link" value="" id="myURL"><br><br>
         <input type="text" name="code" value="" id="myCode"><br><br>
-        <span style="align-content: center;">
-          <button id="copyLinkBtn" onclick="copyLink()">Copy Link</button>
-          <button id="copyCodeBtn" onclick="copyCode()">Copy code</button>
-        </span>
+        <center>
+          <span>
+            <button class="btn btn-success" style="text-align: center; padding: 0;" id="copyLinkBtn" onclick="copyLink()">Copy Link</button>
+            <button class="btn btn-success" style="text-align: center; padding: 0;" id="copyCodeBtn" onclick="copyCode()">Copy code</button>
+          </span>
+        </center>
       </div>
     </div>
 
     <div id="myUserModal" class="Usermodal">
-      <div class="user-modal-content">
+      <div class="user-modal-content" style="position: fixed; right: 80px; width: 20%; height: auto; border-block-color: #212126; border-block-width: 3px; border-radius: 10px;">
         <span class="close-span">x</span>
-        <p>User data:</p>
-        <!-- <input type="text" name="link" value="" id="myURL"><br><br>
-        <input type="text" name="code" value="" id="myCode"><br><br> -->
-        <span style="align-content: center;">
-          <button id="user-profile" onclick="UserProfile(this)"></button>
-          <button id="user-mute" onclick="MuteAlert(this)"></button>
-          <!-- <button id="user-video" onclick="VideoAlert(this)"></button> -->
-        </span>
+        <p style="text-align: center; font-size: 20px;">User data:</p>
+        <div style="padding-top: 20px; padding-bottom: 10px;">
+          <button class="btn btn-success" id="user-profile" onclick="UserProfile(this)"></button>
+        </div>
+        <div style="align-content: center;">
+          <button class="btn btn-success" id="user-mute" onclick="MuteAlert(this)"></button>
+        </div>
       </div>
     </div>
 
-    <div class="main">  
-    <div class="main__left" style="display: flex; flex: 1;">
-      <div class="videos__group">
-        <div id="my-video-grid" class="video-here">
-            
-        </div>
-        <div id="video-grid" class="video-here">
+    <div id="notificationModal" class="Notificationmodal">
+      <div class="notification-modal-content" style="position: fixed; right: 80px; width: 20%; height: auto; border-block-color: #212126; border-block-width: 3px; border-radius: 10px;">
+        <span class="span-close">x</span>
+        <div class="messages" id="notification-messages">
 
-          <div id="photo-grid" style="display: none;">
-            <img id="no-photo" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
-          </div>
         </div>
       </div>
-      <div class="options">
-        
-        <div class="options__left">
-          <div id="stopVideo" class="options__button" onclick="onoffVideo()">
+    </div>
+
+  <div class="main">
+    <div class="main__left__left">
+      <div class="left-sidenav">
+        <a href="#" style="height: 100px;"><img src="css/videoicon.png" alt="" style="width: 4vw; right: 0; position: fixed; left: 8px; float: right; top: 0;"></a>
+        <!-- <div class="btn" style="background-color: black; font-size: 20px;"></div> -->
+        <div id="home" class="options__button" style="left: 9px; top: 240px; position: fixed;">
+          <i class="fa fa-home" aria-hidden="true"></i>
+        </div>
+        <div id="inviteButton" class="options__button" onclick="invite(this)" style="position: fixed; top: 325px; left: 8px;">
+          <i style="padding-left: 4px;" class="fas fa-user-plus"></i>
+        </div>
+
+        <div id="notificationButton" onclick="notification()" class="options__button" style="position: fixed; top: 410px; left: 8px;">
+          <i class="fa fa-bell"></i>
+          <span class='badge2 badge2-warning' id='lblCartCount2' style="display: none; position: absolute; left: 46px; text-align: center; bottom: 32px; font-size: 12px; border-radius: 50%; height: 19px;">
+            <center>
+              <p id="new-notification" style="position: relative; left: -4px;"></p>
+            </center>
+          </span>
+        </div>
+         <!-- <a href="#"><i class="fa fa-home" aria-hidden="true" style="color: green; font-size: 30px;"></i></a> -->
+      </div>
+    </div>
+    <div class="main__left" style="display: flex; flex: 0.9481;">
+      <div class="videos__group">
+        <div id="video-grid" class="video-here">
+
+        </div>
+      </div>
+
+      <div class="options" style="bottom: 20px; position: relative; left: 38%; width: 352px; border-radius: 100px;">
+        <div class="options__left" style="padding-right: 20px;">
+          <div id="stopVideo" class="options__button" onclick="onoffVideo(this)">
             <i class="fa fa-video-camera"></i>
           </div>
-          <div id="muteButton" class="options__button" onclick="onoffVoice()">
+          <div id="muteButton" class="options__button" onclick="onoffVoice(this)">
             <i class="fa fa-microphone"></i>
           </div>
         </div>
         <div id="cutButton" class="options__button" onclick="leave()">
             <i style="font-size:24px; transform: rotate(225deg);" class="fa fa-phone"></i>
         </div>
-        <div class="options__right">
+
+        <div class="options__right" style="padding-left: 20px;">
           <div onclick="showChat()" id="chatButton" class="options__button">
             <i class='fas fa-comments'></i>
-          </div>
-          <div id="inviteButton" class="options__button" onclick="invite(this)">
-            <i class="fas fa-user-plus"></i>
+            <span class='badge badge-warning' id='lblCartCount'>  </span>
           </div>
           <div id="participantsButton" class="options__button" onclick="participants(this)">
             <i class="fa fa-users fa-2" aria-hidden="true"></i>
@@ -95,29 +331,32 @@
 
     <div class="main__right__right" id="main-participants" style="display: none; flex: 0;">
       <div class="main__chat_window">
-          <h2 style="color: white;">Participants:</h2>
-          <input type="text" id="search-names" onkeyup="searchNames()" placeholder="Search for names.." title="Type in a name">
+          <div id="size">
+
+          </div>
+
+          <div class="search-container" style="padding-top: 29px; padding-bottom: 59px;">
+              <input style="width: 23%; position: fixed; left: 72%; height: 40px; border-radius: 6px;" type="text" placeholder="Search for names.." id="search-names" onkeyup="searchNames()" title="Type in a name">
+              <button onclick="searchNames()" style="position: fixed; left: 93%; width: 39px; height: 40px;" type="submit"><i class="fa fa-search"></i></button>
+          </div>
+
           <div class="messages" id="NoOfparticipants">
 
-              <!-- <div id='user-content' class="dropdown-content">
-                <a onclick="UserProfile(this)" href="#">nothing profile</a>
-                <a onclick="MuteAlert(this)" href="#">Ask nothing to mute</a>
-                <a onclick="VideoAlert(this)" href="#">Ask nothing to turn video off</a>
-              </div> -->
           </div>
       </div>
     </div>
 
     <div class="main__right" id="main-chat" style="display: none; flex: 0;">
       <div class="main__chat_window">
+        <center><div style="color: white; background-color: black; font-size: 30px; padding: 9px; border-radius: 9px;">Chat</div></center>
           <div class="messages" id="sending-messages">
 
           </div>
       </div>
       <div class="main__message_container" id="message-container">
-        <form id="message-form">
-            <input style="width: 23vw; height: 5vh;" type="text" name="message" placeholder="Message" autocomplete="off">
-            <button style="width: 3vw; height: 2vw" type="submit" id="submitBtn">Send</button>
+        <form id="message-form" style="padding-bottom: 7px;">
+            <input style="width: 23vw; height: 5vh;" type="text" name="message" placeholder="Enter your message here" autocomplete="off">
+            <button class="btn btn-success" style="height: 2vw; background-color: #0da516; text-align: center;" type="submit" id="submitBtn">Send</button>
         </form>
         </div>
       </div>
@@ -129,7 +368,7 @@
   <script id="message-template" type="text/html">
     <div>
       <p>
-          <span>{{username}}</span>     
+          <span>{{username}}</span>
           <span style="padding-left: 20%;">{{createdAt}}</span>
       </p>
       <p>{{message}}</p>
@@ -138,14 +377,31 @@
  <!-- Traverese the array from beginning -->
 <script id="participants-template" type="text/html">
     <div>
-        <ul id="names-of-participants">
-            {{#users}}   
+      <ul class="ul-names" id="names-of-participants">
+        {{#users}}
+          <li id="names"><a onclick="User(this)" id="dropBtn"> {{ firstname }} {{ lastname }} <br><span style="display: none;">{{ username }}</span></a></li>
+        {{/users}}
+      </ul>
+        <!-- <ul id="names-of-participants">
+            {{#users}}
               <li><a onclick="User(this)" id="dropBtn"> {{ firstname }} {{ lastname }} <br><span style="display: none;">{{ username }}</span></a></li>
             {{/users}}
-        </ul>
-    </div>   
+        </ul> -->
+    </div>
+</script>
+
+<script id="size-template" type="text/html">
+    <div style=" padding-bottom: 20px;">
+      <center><div style="color: white; background-color: black; font-size: 30px; padding: 9px; border-radius: 9px;">Participants({{size}})</div></center>
+    </div>
+</script>
+
+<script id="notification-template" type="text/html">
+  <div style="color: black;">
+    <p>{{message}}</p><br>
+  </div>
 </script>
 
   </body>
-  
+
 </html>

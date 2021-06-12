@@ -1,13 +1,29 @@
 <%- include("partials/header") %>
 
-<form action='/join' method="POST">
-    <!-- <input type="text" name="room" placeholder="Create a new meeting"> -->
-    <button>Create a new meeting</button>
-</form>
+<link rel="stylesheet" href="join.css">
 
-<form action='/joinExisting' method="POST">
-    <input type="text" name="existingRoom" placeholder="Join a meeting">
-    <button>Join</button>
-</form>
+<div class="row">
+  <div class="col-sm-3" id="column1">
+    <h2>Video Call App</h2>
+    <p><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br>
+      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+      nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor <br>
+      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+      pariatur. Excepteur sint occaecat cupidatat non proident, sunt<br> in culpa
+      qui officia deserunt mollit anim id est laborum.</p>
 
+    <form action='/join' method="POST" id="form1">
+        <button id="btn1" class="btn btn-success">Create a new meeting</button>
+    </form>
+    <form action='/joinExisting' method="POST" id="form2">
+      <span> OR </span>
+        <input class="form-rounded" type="text" name="existingRoom" placeholder="Join a meeting">
+        <button class="btn btn-success" id="btn2">Join</button>
+    </form>
+  </div>
+  <div class="col-sm-5" id="column2">
+    <img src="https://www.cnet.com/a/img/L25_mhBJJSvo4gPDIlVnCDjlLos=/940x0/2019/04/05/dca690a2-c5ae-416a-aade-a758b76bd2c7/skype.jpg"  class="rounded" alt="Video Call">
+  </div>
+</div>
 <%- include("partials/footer") %>

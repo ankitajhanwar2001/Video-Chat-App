@@ -2,12 +2,14 @@ const express = require("express");
 const app = express();
 var bodyParser = require('body-parser');
 var passport = require('passport');
-var User = require('./models/user.js');
 var LocalStrategy = require('passport-local');
 var methodOverride = require('method-override');
 var mongoose = require('mongoose');
+
 var middleware = require('./middleware/index');
 var generatedMessage = require('./models/message');
+var User = require('./models/user.js');
+var Room = require('./models/room.js');
 
 // Server
 const server = require("http").Server(app);
@@ -29,34 +31,10 @@ app.use(require('express-session')({
     resave: false,
     saveUninitialize: false
 }));
-//mongodb+srv://VideoChatApp:SumanSunil@303@videochatapp.1cvrt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority     mongodb+srv://VideoChatApp:SumanSunil@303@videochatapp.1cvrt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
-// mongoose.connect("mongodb://localhost/video_chat", function(req,res) {
-//     console.log('Database connected');
-// });
 
 mongoose.connect("mongodb+srv://video-chat-app:ankita2001@cluster0.hgets.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",function(res,req){
    console.log("Database Connected");
  });
-
-
-// const MongoClient = require('mongodb').MongoClient;
-// const uri = "mongodb+srv://VideoChatApp:SumanSunil@303@videochatapp.1cvrt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-// client.connect(err => {
-//   const collection = client.db("test").collection("devices");
-//   // perform actions on the collection object
-//   client.close();
-// });
-
-
-// const MongoClient = require('mongodb').MongoClient;
-// const uri = "mongodb+srv://ankitajhanwar:SumanSunil@303@videochatapp.zajvp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-// client.connect(err => {
-//   const collection = client.db("test").collection("devices");
-//   // perform actions on the collection object
-//   client.close();
-// });
 
 
 app.set('view engine', 'ejs');
@@ -118,9 +96,9 @@ app.get('/login', function(req, res) {
 })
 
 app.post('/login', passport.authenticate('local', {
-    failureRedirect: '/login' 
+    failureRedirect: '/login'
 }), function(req, res) {
-    // username: req.body.username 
+    // username: req.body.username
     User.find({ username: req.body.username }, function(err, user) {
         if(err) {
             console.log('Error');
@@ -130,7 +108,7 @@ app.post('/login', passport.authenticate('local', {
             // console.log(currentUsername);
         }
     })
-    // currentUsername = req.body.username;   
+    // currentUsername = req.body.username;
     res.redirect('/join');
 });
 
@@ -142,8 +120,8 @@ app.get('/logout', middleware.isLoggedIn, function(req, res) {
 
 // JOIN
 app.get('/join', middleware.isLoggedIn, function(req, res) {
-    // console.log(req.body);
-    res.render('join.ejs');
+    // console.log(currentUsername);
+    res.render('join.ejs', { user: currentUsername });
 })
 
 app.post('/join', middleware.isLoggedIn, function(req, res) {
@@ -176,27 +154,27 @@ app.get('/:roomId', middleware.isLoggedIn, function (req, res) {
 });
 
 io.on('connection', function(socket) {
+
     socket.on('join-room', (roomId, userId) => {
-        socket.emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
-        console.log(userId);
-        const { rooms } = addRoom(roomId);
-        // { id }
-        const { error, user } = addUser({ 
-            id: userId, 
-            firstname: currentUsername.firstname, 
-            lastname: currentUsername.lastname, 
-            username: currentUsername.username, 
-            email: currentUsername.email, 
-            room: roomId 
-        })
         socket.join(roomId);
         socket.join(userId);
 
-        // console.log(io.sockets.adapter.rooms.get(roomId).size);
-        // io.emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
+        io.to(roomId).emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
+
+        const { rooms } = addRoom(roomId);
+        const { error, user } = addUser({
+            id: userId,
+            firstname: currentUsername.firstname,
+            lastname: currentUsername.lastname,
+            username: currentUsername.username,
+            email: currentUsername.email,
+            room: roomId
+        })
+
+
         socket.broadcast.to(roomId).emit('user-connected', userId);
-        socket.broadcast.to(roomId).emit('newMessage', generatedMessage('Admin', 'New user joined'));
-        
+        socket.broadcast.to(roomId).emit('newMessage', generatedMessage('Admin', currentUsername.firstname + ' ' + currentUsername.lastname + ' joined'));
+
         socket.on('createMessage', function(message, callback) {
             if(message!='') {
                 var user = getUser(userId);
@@ -206,24 +184,9 @@ io.on('connection', function(socket) {
             callback();
         })
 
-        
-        socket.on("user-disconnecting", function(userId) {
-            socket.on('disconnect', function() {
-                // console.log(io.sockets.adapter.rooms.get(roomId));
-                if(io.sockets.adapter.rooms.get(roomId) == undefined) {
-                    var room = removeRoom(roomId);
-                }
-                var user = removeUser(userId);
-                
-                if(user) {
-                    io.to(user.room).emit('no-of-participants', {
-                        room: roomId,
-                        users: getUserInRoom(roomId)
-                    })
-                }
-                socket.broadcast.to(roomId).emit('user-disconnected', userId);
-            })
-            // socket.broadcast.to(roomId).emit('user-disconnected', userId);
+        io.to(roomId).emit('no-of-participants', {
+            room: roomId,
+            users: getUserInRoom(roomId)
         })
 
         // Contacting specific user
@@ -243,7 +206,7 @@ io.on('connection', function(socket) {
             if(flag == 0) {
                 console.log("Not found");
             } else {
-                if(userId != data.id) 
+                if(userId != data.id)
                 io.to(data.id).emit('alert-message', message);
             }
         })
@@ -268,28 +231,23 @@ io.on('connection', function(socket) {
             }
         })
 
-        io.to(roomId).emit('no-of-participants', {
-            room: roomId,
-            users: getUserInRoom(roomId)
-        })
+        socket.on("user-disconnecting", function(userId) {
+            socket.on('disconnect', function() {
+                // console.log(io.sockets.adapter.rooms.get(roomId));
+                if(io.sockets.adapter.rooms.get(roomId) == undefined) {
+                    var room = removeRoom(roomId);
+                }
+                var user = removeUser(userId);
 
-        // socket.on('get-username', function(username) {
-        //     console.log(username);
-        //     var user = username.substring(1);
-        //     // user = user.substring(0,user.indexOf(' '));
-        //     user = user.split(' ');
-        //     console.log(user);
-        //     // username = username.trim();
-        //     User.find({ firstname: user[0], lastname: user[1] }, function(err, user) {
-        //         if(err) {
-        //             console.log('error');
-        //         } else {
-        //             // var name = user[0] + " " + user[1];
-        //             console.log(user);
-        //             socket.emit('update-user-name', user[0]);
-        //         }
-        //     })
-        // })
+                if(user) {
+                    io.to(user.room).emit('no-of-participants', {
+                        room: roomId,
+                        users: getUserInRoom(roomId)
+                    })
+                }
+                socket.broadcast.to(roomId).emit('user-disconnected', userId);
+            })
+        })
 
         socket.on('disconnect', function() {
             // console.log(io.sockets.adapter.rooms.get(roomId).size);
@@ -305,10 +263,10 @@ io.on('connection', function(socket) {
             }
             socket.broadcast.to(roomId).emit('user-disconnected', userId);
         })
-        
+
     });
 
-    
+
 });
 
 server.listen(port, function() {

@@ -1,0 +1,76 @@
+body {
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* .column {
+  float: left;
+  width: 33.33%;
+  padding: 5px;
+} */
+
+h2 {
+  padding-left: 5rem;
+  color:white;
+}
+
+#column1 {
+  width: auto;
+  padding-top: 120px;
+}
+
+#column2 {
+  padding-right: 35px;
+  padding-top: 120px;
+}
+
+#form2 {
+  padding-top: 0rem;
+  display: inline;
+}
+
+#form1 {
+   padding-left: 5rem;
+   display: inline;
+}
+
+#btn1 {
+  height: 40px;
+  width: 250px;
+}
+
+#btn2 {
+  height: 40px;
+  width: 60px;
+}
+
+input {
+  height: 40px;
+  width: 200px;
+  text-align: center;
+}
+
+span {
+   color: white;
+   padding-right: 2rem;
+   padding-left: 2rem;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+p {
+    color:white;
+    padding-left: 5rem;
+    padding-bottom: 5rem;
+}
+img {
+  width: 100%;
+  box-shadow: 5px 10px 8px 5px black;
+}

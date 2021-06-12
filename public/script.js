@@ -1,35 +1,52 @@
 const socket = io('/');
 
 const videoGrid = document.getElementById('video-grid');
-// const myVideoGrid = document.getElementById('my-video-grid');
-
-const photoGrid = document.getElementById('photo-grid');
 
 var mainChat = document.getElementById('main-chat');
 var mainParticipants = document.getElementById('main-participants');
 var messageForm = document.getElementById('message-form');
 var messages = document.getElementById('sending-messages');
-// var NoOfPeople = document.getElementById('NoOfparticipants');
+var notificationMessage = document.getElementById('notification-messages');
 
-// var inputMessage = document.getElementById('chat_message');
 var messageFormButton = messageForm.querySelector('button');
 var messageFormValue = messageForm.querySelector('input');
 
+// INVITE MODAL
+var modal = document.getElementById("myModal");
+var span = document.getElementsByClassName("close")[0];
+var link = document.getElementById("myURL");
+var code = document.getElementById("myCode");
+var linkBtn = document.getElementById("copyLinkBtn");
+var codeBtn = document.getElementById("copyCodeBtn");
+
+// ALERT MODAL
+var Usermodal = document.getElementById("myUserModal");
+var close = document.getElementsByClassName("close-span")[0];
+var profile = document.getElementById("user-profile");
+var mute = document.getElementById("user-mute");
+
+// NOTIFICATION MODAL
+var Notificationmodal = document.getElementById("notificationModal");
+var closeSpan = document.getElementsByClassName("span-close")[0];
+
 var messageTemplate = document.querySelector("#message-template").innerHTML;
 var participantsTemplate = document.querySelector("#participants-template").innerHTML;
+var sizeTemplate = document.querySelector("#size-template").innerHTML;
+var notificationTemplate = document.querySelector("#notification-template").innerHTML;
 
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true });
 
 let myVideoStream;
 let userID;
 let userdata;
+let chatNo = 0;
+let notificationNo = 0;
 const peers = {};
 
 const myPeer = new Peer(undefined, {
-    // host: 'localhost',
     path: '/peerjs',
     host: '/',
-    port: '443'
+    port: '8080'
 })
 
 var myVideo = document.createElement('video');
@@ -58,11 +75,26 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-connected', function(userId) {
         console.log("user connected");
         console.log(myVideo.muted);
-        connectToNewUser(userId, stream)
+        connectToNewUser(userId, stream);
+        console.log('yoyoyoyo');
     })
 
     socket.on('newMessage', function(message) {
         console.log(message);
+        if(mainChat.style.display === "none") {
+          document.getElementById('lblCartCount').style.display = 'flex';
+          chatNo++;
+          console.log(chatNo);
+          if(chatNo == 0) {
+            document.getElementById('lblCartCount').style.display = "";
+          } else {
+            document.getElementById('lblCartCount').innerHTML = chatNo;
+          }
+        } else {
+          chatNo = 0;
+          document.getElementById('lblCartCount').innerHTML = "";
+          console.log(chatNo);
+        }
         const html = Mustache.render(messageTemplate, {
             username: message.from,
             message: message.text,
@@ -74,36 +106,50 @@ navigator.mediaDevices.getUserMedia({
 
 socket.on('no-of-participants', function({ room, users }) {
     console.log(users);
+    var size = users.length;
+
+    const html1 = Mustache.render(sizeTemplate, {
+        size
+    })
+
     const html = Mustache.render(participantsTemplate, {
         room,
         users
     })
     document.getElementById("NoOfparticipants").innerHTML = html;
+    document.getElementById("size").innerHTML = html1;
 })
 
 
 // Showing user data
 socket.on('user-data', function(user) {
     console.log(user);
-    // location.href += '/user';
     window.open('/user', '_blank');
 })
 
 // Alerting specific user
 socket.on('alert-message', function(message) {
-    alert(message);
-})
+      // document.getElementById('lblCartCount2').style.display = 'flex';
+      notificationNo++;
+      console.log(notificationNo);
+      if(notificationNo == 0) {
+        document.getElementById('lblCartCount2').style.display = "none";
+      } else {
+        document.getElementById('lblCartCount2').style.display = "flex";
+        document.getElementById('new-notification').innerHTML = notificationNo;
+      }
 
-// socket.on('update-user-name', function(user) {
-//     userdata = user;
-// })
+    const html = Mustache.render(notificationTemplate, {
+        message
+    })
+    notificationMessage.innerHTML += html;
+    // alert(message);
+})
 
 socket.on('user-disconnected', userId => {
     if(peers[userId])
     peers[userId].close();
 })
-
-
 
 myPeer.on('open', function(id) {
     userID = id;
@@ -134,7 +180,7 @@ function addVideoStream(video, stream) {
         console.log("upljxbx");
         videoGrid.append(video);
     }
-    else 
+    else
     console.log('Error....');
 }
 
@@ -152,7 +198,7 @@ messageForm.addEventListener('click', function(e) {
         if(error) {
             return console.log(error);
         }
-        
+
     });
 })
 
@@ -160,6 +206,8 @@ messageForm.addEventListener('click', function(e) {
 function showChat() {
 
     if (mainChat.style.display === "none") {
+        chatNo = 0;
+        document.getElementById('lblCartCount').style.display = 'none';
         document.getElementsByClassName("main__left")[0].style.flex = 0.7;
         document.getElementsByClassName("main__right")[0].style.flex = 0.3;
         mainParticipants.style.flex = 0;
@@ -195,50 +243,33 @@ function participants(e) {
 }
 
 // VIDEO ON/OFF
-function onoffVideo() {
+function onoffVideo(e) {
     let enabled = myVideoStream.getVideoTracks()[0].enabled;
     console.log(myVideoStream.getTracks());
     if (enabled) {
+        e.firstElementChild.classList.value = 'fa fa-video-slash';
         myVideoStream.getVideoTracks()[0].enabled = false;
-        // videoGrid.style.display = 'none';
-        // for(var i = 0; i < videoGrid.childElementCount; i++) {
-        //     if(videoGrid.style.display === "none") {
-        //         videoGrid.children[i].innerHTML = '<img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">'
-        //         videoGrid.children[i].style.display = 'flex';
-        //     }
-        // }
-        
-        // console.log(videoGrid.firstElementChild);
-        // videoGrid.firstElementChild.innerHTML = "hcsdabhgd";'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
-        // myVideo.srcObject = img;
-        // videoGrid.append(myVideo);
-        // setPlayVideo();
-        // myVideoGrid.style.display = 'none';
-        // videoGrid.firstElementChild.innerHTML = "hjscbaj";
-        // photoGrid.style.display = 'flex';
-        // socket.emit('videoOFF', ROOM_ID);
     } else {
-        // setStopVideo();
-        // videoGrid.style.display = 'flex';
-        // // photoGrid.style.display = 'none';
-
-        // for(var i = 0; i < videoGrid.childElementCount; i++) {
-        //     if(videoGrid.style.display === "flex")
-        //     videoGrid.children[i].style.display = 'none';
-        // }
+        e.firstElementChild.classList.value = 'fa fa-video-camera';
         myVideoStream.getVideoTracks()[0].enabled = true;
     }
 }
 
-function onoffVoice() {
+function onoffVoice(e) {
     let enabled = myVideoStream.getAudioTracks()[0].enabled;
     console.log(myVideoStream.getTracks(), myVideoStream.getAudioTracks()[0]);
     if (enabled) {
+        console.log(e);
+        e.firstElementChild.classList.value = 'fa fa-microphone-slash';
+        // document.getElementById("muteButton").innerHTML = '<i class='fas fa-microphone-slash'></i>';
         myVideo.muted = true;
         myVideoStream.getAudioTracks()[0].enabled = false;
         // setPlayVideo();
     } else {
         // setStopVideo();
+        console.log(e);
+        e.firstElementChild.classList.value = 'fa fa-microphone';
+        // document.getElementById("muteButton").innerHTML = '<i class='fas fa-microphone'></i>';
         myVideo.muted = true;
         myVideoStream.getAudioTracks()[0].enabled = true;
     }
@@ -250,19 +281,12 @@ function leave() {
     location.href='/';
 }
 
-var modal = document.getElementById("myModal");
-var span = document.getElementsByClassName("close")[0];
-var link = document.getElementById("myURL");
-var code = document.getElementById("myCode");
-var linkBtn = document.getElementById("copyLinkBtn");
-var codeBtn = document.getElementById("copyCodeBtn");
-
-
 function invite(e) {
     link.value = e.baseURI;
     code.value = ROOM_ID;
     modal.style.display = "block";
 }
+
 span.onclick = function() {
     modal.style.display = "none";
     linkBtn.innerHTML = 'Copy Link';
@@ -270,10 +294,13 @@ span.onclick = function() {
 }
 
 window.onclick = function(e) {
-    // console.log(e);
-
     if (e.target == Usermodal) {
         Usermodal.style.display = "none";
+    }
+
+    if (e.target == Notificationmodal) {
+        notificationMessage.innerHTML = '';
+        Notificationmodal.style.display = "none";
     }
 
     if (e.target == modal) {
@@ -281,17 +308,6 @@ window.onclick = function(e) {
         linkBtn.innerHTML = 'Copy Link';
         codeBtn.innerHTML = 'Copy code';
     }
-
-//     if (!e.target.matches('#dropBtn')) {
-//     var dropdowns = document.getElementsByClassName("dropdown-content");
-//     var i;
-//     for (i = 0; i < dropdowns.length; i++) {
-//       var openDropdown = dropdowns[i];
-//       if (openDropdown.classList.contains('show')) {
-//         openDropdown.classList.remove('show');
-//       }
-//     }
-//   }
 }
 
 function copyLink() {
@@ -314,8 +330,18 @@ function copyCode() {
     codeBtn.innerHTML = 'Copied';
 }
 
-// Search Participants
+function notification() {
+  notificationNo = 0;
+  document.getElementById('lblCartCount2').style.display = 'none';
+  Notificationmodal.style.display = "block";
+}
 
+closeSpan.onclick = function() {
+    notificationMessage.innerHTML = '';
+    Notificationmodal.style.display = "none";
+}
+
+// Search Participants
 function searchNames() {
     var filter, a, i, txtValue;
     var input = document.getElementById("search-names");
@@ -334,58 +360,26 @@ function searchNames() {
     }
 }
 
-
-
-var Usermodal = document.getElementById("myUserModal");
-var close = document.getElementsByClassName("close-span")[0];
-var profile = document.getElementById("user-profile");
-var mute = document.getElementById("user-mute");
-var Uservideo = document.getElementById("user-video");
-// var userdata;
-
+function User(e) {
+    console.log(e.text);
+    var user = e.text.split(' ');
+    userdata = user[3];
+    var username = user[1] + " " + user[2];
+    document.getElementById('user-profile').textContent = username + ' Profile';
+    document.getElementById('user-mute').textContent = 'Ask ' + username + ' to mute';
+    Usermodal.style.display = "block";
+}
 
 // Displaying Profile
 function UserProfile(e) {
-    // console.log(e);
     console.log(userdata);
     var user = userdata;
-    // .substring(1);
-    // user = user.substring(0,user.indexOf(' '));
-    // socket.emit('sending-to-user', ROOM_ID, e.text);
-
     socket.emit('user-profile', ROOM_ID, user);
 }
 
 function MuteAlert(e) {
-    // console.log(e.text);
     var user = userdata;
-    // .substring(userdata.text.indexOf(' ')+1);
-    // user = user.split(" ")[0];
-    socket.emit('sending-to-user', ROOM_ID, user, 'Kindly mute yourself');
-}
-
-// function VideoAlert(e) {
-//     // console.log(e);
-//     var user = userdata;
-//     // .substring(userdata.text.indexOf(' ')+1);
-//     // user = user.split(" ")[0];
-//     socket.emit('sending-to-user', ROOM_ID, user, 'Kindly turn off your video');
-// }
-
-/* When the user clicks on the button, toggle between hiding and showing the dropdown content */
-
-function User(e) {
-    // socket.emit('get-username', e.text);
-    
-    console.log(e.text);
-    var user = e.text.split(' ');
-    userdata = user[3];
-    // console.log(user);
-    var username = user[1] + " " + user[2];
-    document.getElementById('user-profile').textContent = username + ' Profile';
-    document.getElementById('user-mute').textContent = 'Ask ' + username + ' to mute';
-    // document.getElementById('user-video').textContent = 'Ask ' + username + ' to turn video off';
-    Usermodal.style.display = "block";
+    socket.emit('sending-to-user', ROOM_ID, user, 'Someone asked you to kindly mute yourself.');
 }
 
 close.onclick = function() {
