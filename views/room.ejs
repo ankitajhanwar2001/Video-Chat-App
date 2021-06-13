@@ -229,7 +229,7 @@
         <div class="dropdown" style="color: white; position: fixed; right: 45px; font-size: 30px; top: 10px;">
           <i class='far fa-user-circle' id="dropbtn"></i>
           <div class="dropdown-content">
-            <a href="#">Profile</a>
+            <a href="#" onclick="myProfile()">Profile</a>
             <a href="/logout">Logout</a>
           </div>
         </div>
@@ -266,9 +266,9 @@
     </div>
 
     <div id="notificationModal" class="Notificationmodal">
-      <div class="notification-modal-content" style="position: fixed; right: 80px; width: 20%; height: auto; border-block-color: #212126; border-block-width: 3px; border-radius: 10px;">
+      <div class="notification-modal-content" style="position: fixed; left: 80px; bottom: 260px; width: 20%; height: auto; border-block-color: #212126; border-block-width: 3px; border-radius: 10px;">
         <span class="span-close">x</span>
-        <div class="messages" id="notification-messages">
+        <div class="messages" id="notification-messages" style="color: black;">
 
         </div>
       </div>
@@ -279,7 +279,7 @@
       <div class="left-sidenav">
         <a href="#" style="height: 100px;"><img src="css/videoicon.png" alt="" style="width: 4vw; right: 0; position: fixed; left: 8px; float: right; top: 0;"></a>
         <!-- <div class="btn" style="background-color: black; font-size: 20px;"></div> -->
-        <div id="home" class="options__button" style="left: 9px; top: 240px; position: fixed;">
+        <div onclick="home()" class="options__button" style="left: 9px; top: 240px; position: fixed;">
           <i class="fa fa-home" aria-hidden="true"></i>
         </div>
         <div id="inviteButton" class="options__button" onclick="invite(this)" style="position: fixed; top: 325px; left: 8px;">
@@ -320,7 +320,7 @@
         <div class="options__right" style="padding-left: 20px;">
           <div onclick="showChat()" id="chatButton" class="options__button">
             <i class='fas fa-comments'></i>
-            <span class='badge badge-warning' id='lblCartCount'>  </span>
+            <span class='badge badge-warning' id='lblCartCount' style="display: none;">  </span>
           </div>
           <div id="participantsButton" class="options__button" onclick="participants(this)">
             <i class="fa fa-users fa-2" aria-hidden="true"></i>
@@ -382,11 +382,6 @@
           <li id="names"><a onclick="User(this)" id="dropBtn"> {{ firstname }} {{ lastname }} <br><span style="display: none;">{{ username }}</span></a></li>
         {{/users}}
       </ul>
-        <!-- <ul id="names-of-participants">
-            {{#users}}
-              <li><a onclick="User(this)" id="dropBtn"> {{ firstname }} {{ lastname }} <br><span style="display: none;">{{ username }}</span></a></li>
-            {{/users}}
-        </ul> -->
     </div>
 </script>
 

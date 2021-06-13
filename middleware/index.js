@@ -4,12 +4,8 @@ middlewareObj.isLoggedIn = function(req, res, next) {
     if(req.isAuthenticated()) {
         return next();
     }
-    console.log('Not Logged in');
+    req.flash("error", "You need to be logged in to do that");
     res.redirect('/login');
 }
-
-// middleware.userProfile = function(req, res, user) {
-
-// }
 
 module.exports = middlewareObj;

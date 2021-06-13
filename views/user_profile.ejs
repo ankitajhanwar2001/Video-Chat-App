@@ -1,138 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<script src="https://kit.fontawesome.com/c939d0e917.js"></script>
-<style>
-body {
-  font-family: "Lato", sans-serif;
-  background-image:url(https://wallpapercave.com/wp/bYp71HX.jpg);
-  overflow-y: hidden;
-  overflow-x: hidden;
-}
-
-.right-sidenav {
-  height: 100%;
-  width: 300px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  right: 0;
-  background-color: #111;
-  overflow-x: hidden;
-  padding-top: 20px;
-}
-
-.right-sidenav a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
-}
-
-.right-sidenav a:hover {
-  color: #f1f1f1;
-}
-
-.left-sidenav {
-  height: 100%;
-  width: 80px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #111;
-  overflow-x: hidden;
-  padding-top: 20px;
-}
-
-.left-sidenav a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
-}
-
-.left-sidenav a:hover {
-  color: #f1f1f1;
-}
-
-.main {
-  margin-left: 160px;
-  font-size: 28px;
-  padding: 0px 10px;
-}
-
-@media screen and (max-height: 450px) {
-  .left-sidenav {padding-top: 15px;}
-  .left-sidenav a {font-size: 18px;}
-  .right-sidenav {padding-top: 15px;}
-  .right-sidenav a {font-size: 18px;}
-}
-
-/* .btn {
-  background-color: black;
-  border: none;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  border-radius: 50%;
-} */
-
-</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="profile.css">
 </head>
 <body>
 
-  <!-- Left Side Navbar -->
-  <div class="left-sidenav">
-    <a href="#" style="height: 100px;"><img src="css/videoicon.png" alt="" style="width: 5vw; right: 0; position: fixed; left: 1px; float: right;"></a>
-    <div class="btn" style="background-color: black; font-size: 20px;"></div>
-    <a href="#"><i class="fa fa-home" aria-hidden="true" style="color: green; font-size: 30px;"></i></a>
-  </div>
+<h2 style="text-align:center; color: white; font-size: 40px;"><%= user.firstname %> <%= user.lastname %>'s Profile</h2>
 
-  <!-- Right Side Navbar -->
-  <div class="right-sidenav">
-  </div>
-
-<!-- Bottom Navbar -->
-<nav style="width: 80.45%;" class="navbar navbar-inverse navbar-fixed-bottom">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <!-- <a class="navbar-brand" href="#">WebSiteName</a> -->
-    </div>
-    <ul class="nav navbar-nav">
-      <!-- <li class="active"><a href="#">Home</a></li>
-      <li><a href="#">Page 1</a></li>
-      <li><a href="#">Page 2</a></li>
-      <li><a href="#">Page 3</a></li> -->
-    </ul>
-  </div>
-</nav>
-
-<!-- Top Navbar -->
-<nav class="navbar navbar-inverse" style="position: fixed; right: 0; z-index: 1030; width: 94.825%;">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <!-- <a class="navbar-brand" href="#">WebSiteName</a> -->
-    </div>
-    <ul class="nav navbar-nav">
-      <!-- <li class="active"><a href="#">Home</a></li>
-      <li><a href="#">Page 1</a></li>
-      <li><a href="#">Page 2</a></li>
-      <li><a href="#">Page 3</a></li> -->
-    </ul>
-  </div>
-</nav>
-
-<div class="main">
+<div class="card" style="background-color: white; width: 500px; height: 500px; padding-top: 40px;">
+  <img src="https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg" alt="John">
+  <h1><%= user.firstname %> <%= user.lastname %></h1>
+  <p class="title">Username: <%= user.username %></p>
+  <p>Email: <%= user.email %></p>
 </div>
 
 </body>

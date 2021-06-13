@@ -46,7 +46,7 @@ const peers = {};
 const myPeer = new Peer(undefined, {
     path: '/peerjs',
     host: '/',
-    port: '443'
+    port: '8080'
 })
 
 var myVideo = document.createElement('video');
@@ -122,19 +122,26 @@ socket.on('no-of-participants', function({ room, users }) {
 
 
 // Showing user data
-socket.on('user-data', function(user) {
+socket.on('user-data', function(user, currentuser) {
     console.log(user);
+    if(user.username != currentuser.username)
     window.open('/user', '_blank');
+})
+
+// Current User data
+socket.on('my-data', function(user) {
+    console.log(user.id);
+    window.open('/myprofile/' + user.id, '_blank');
 })
 
 // Alerting specific user
 socket.on('alert-message', function(message) {
-      // document.getElementById('lblCartCount2').style.display = 'flex';
-      notificationNo++;
       console.log(notificationNo);
-      if(notificationNo == 0) {
+      if(Notificationmodal.style.display === "block") {
+        notificationNo = 0;
         document.getElementById('lblCartCount2').style.display = "none";
       } else {
+        notificationNo++;
         document.getElementById('lblCartCount2').style.display = "flex";
         document.getElementById('new-notification').innerHTML = notificationNo;
       }
@@ -142,7 +149,12 @@ socket.on('alert-message', function(message) {
     const html = Mustache.render(notificationTemplate, {
         message
     })
-    notificationMessage.innerHTML += html;
+    // document.getElementById('box-notification').innerHTML +=html;
+    if(notificationMessage.innerHTML === 'No new notifications.') {
+      notificationMessage.innerHTML = html;
+    } else {
+      notificationMessage.innerHTML += html;
+    }
     // alert(message);
 })
 
@@ -275,6 +287,14 @@ function onoffVoice(e) {
     }
 }
 
+function home() {
+  location.href = '/';
+}
+
+function myProfile() {
+  socket.emit('my-profile', ROOM_ID);
+}
+
 function leave() {
     console.log(userID);
     socket.emit("user-disconnecting", userID);
@@ -331,13 +351,20 @@ function copyCode() {
 }
 
 function notification() {
+  if(notificationNo != 0) {
+    // notificationMessage.innerHTML = '';
+  } else {
+    notificationMessage.innerHTML = 'No new notifications.';
+  }
   notificationNo = 0;
+  // document.querySelector('.box').style.display = 'block';
   document.getElementById('lblCartCount2').style.display = 'none';
   Notificationmodal.style.display = "block";
 }
 
 closeSpan.onclick = function() {
     notificationMessage.innerHTML = '';
+    // document.querySelector('.box').style.display = 'none';
     Notificationmodal.style.display = "none";
 }
 

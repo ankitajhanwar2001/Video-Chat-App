@@ -1,11 +1,13 @@
 const express = require("express");
 const app = express();
+var flash = require('connect-flash');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var methodOverride = require('method-override');
 var mongoose = require('mongoose');
 
+// app.use(flash());
 var middleware = require('./middleware/index');
 var generatedMessage = require('./models/message');
 var User = require('./models/user.js');
@@ -24,6 +26,8 @@ const peerServer = ExpressPeerServer(server, {
 let currentUsername;
 let redirectURL;
 let userData;
+let usercurrent;
+let userCurrent;
 const { addUser, removeUser, getUser, getUserInRoom, addRoom, removeRoom, roomFind } = require("./models/roomData");
 
 app.use(require('express-session')({
@@ -31,11 +35,19 @@ app.use(require('express-session')({
     resave: false,
     saveUninitialize: false
 }));
+app.use(flash());
+
+app.use(function(req, res, next) {
+    res.locals.newUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
+    next();
+});
 
 mongoose.connect("mongodb+srv://video-chat-app:ankita2001@cluster0.hgets.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",function(res,req){
    console.log("Database Connected");
  });
-
+mongoose.set('useFindAndModify', false);
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded('extended: true'));
@@ -57,6 +69,11 @@ passport.deserializeUser(User.deserializeUser());
 // app.use(indexRoutes);
 // app.use(serverRoutes);
 
+app.use(function(req, res, next) {
+    res.locals.newUser = req.user;
+    next();
+});
+
 app.get('/', function(req, res) {
     res.render('home.ejs');
 })
@@ -69,7 +86,9 @@ app.get('/register', function(req, res) {
 
 app.post('/register', function(req, res) {
     // currentUsername = req.body.username;
-    console.log(currentUsername);
+    console.log(req.user);
+    userCurrent = req.user;
+    console.log(userCurrent);
     console.log(req.body);
     var user = {
         firstname: req.body.firstname,
@@ -82,9 +101,17 @@ app.post('/register', function(req, res) {
     User.register(newUser, req.body.password, function(err, user) {
         if(err) {
             console.log("Error");
+            if(newUser.username.length == 0) {
+                req.flash("error", "Invalid username");
+            } else if(req.body.password.length == 0) {
+                req.flash("error", "Invalid password");
+            } else {
+                req.flash("error", "A user with the given username is already registered");
+            }
             res.redirect('/register');
         }
         passport.authenticate('local')(req, res, function() {
+            req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
             res.redirect('/join');
         })
     })
@@ -96,31 +123,32 @@ app.get('/login', function(req, res) {
 })
 
 app.post('/login', passport.authenticate('local', {
-    failureRedirect: '/login'
+    failureRedirect: '/login',
+    failureFlash: 'Invalid username or password.'
 }), function(req, res) {
-    // username: req.body.username
+    userCurrent = req.user;
     User.find({ username: req.body.username }, function(err, user) {
         if(err) {
-            console.log('Error');
+            console.log(err);
         } else {
-            // console.log(user);
             currentUsername = user[0];
-            // console.log(currentUsername);
+            console.log(currentUsername);
         }
     })
-    // currentUsername = req.body.username;
     res.redirect('/join');
 });
 
 // LOGOUT
 app.get('/logout', middleware.isLoggedIn, function(req, res) {
     req.logout();
+    req.flash("success", "Logged you out");
     res.redirect('/');
 })
 
 // JOIN
 app.get('/join', middleware.isLoggedIn, function(req, res) {
-    // console.log(currentUsername);
+  console.log(req.user);
+  console.log(userCurrent);
     res.render('join.ejs', { user: currentUsername });
 })
 
@@ -140,21 +168,62 @@ app.post('/joinExisting', middleware.isLoggedIn, function(req, res) {
     if(index != -1) {
         res.redirect(`/${ req.body.existingRoom }`);
     } else {
-        console.log('Does not exist');
+        req.flash("error", "Room doesn't exist.");
         res.redirect('/joinExisting');
     }
 })
 
-app.get('/user', middleware.isLoggedIn, function(req, res) {
+app.get('/user', function(req, res) {
     res.render('user_profile', { user: userData });
 })
+
+app.get('/myprofile/:id', function(req, res) {
+    var user = getUser(req.params.id);
+    console.log(req.params.id);
+    console.log("&&&&&     "+req.user);
+    res.render('my_profile', { user: user });
+})
+
+//EDIT
+app.get("/profile/:id/edit", function(req, res) {
+    var currentUser = getUser(req.params.id);
+    User.find({ username: currentUser.username }, function(err, user) {
+        if(err) {
+            req.flash("error", "Something went wrong");
+            console.log(err);
+            res.redirect("/");
+        } else {
+            res.render("edit_profile", { user: user[0], id: req.params.id });
+        }
+    });
+
+});
+
+//UPDATE
+app.put("/profile/:id", function(req, res) {
+    // res.send(req.body);
+    console.log(req.params.id);
+    // res.redirect('/');
+    var currentUser = getUser(req.params.id);
+    // console.log("######3   "+currentUser);
+    User.findOneAndUpdate({ username: currentUser.username }, req.body, function(err, user) {
+        if(err) {
+          req.flash("error", "Something went wrong");
+        } else {
+            currentUser.firstname = req.body.firstname;
+            currentUser.lastname = req.body.lastname;
+            currentUser.username = req.body.username;
+            currentUser.email = req.body.email;
+            res.render('my_profile', { user: currentUser });
+        }
+    });
+});
 
 app.get('/:roomId', middleware.isLoggedIn, function (req, res) {
     res.render('room', { roomId: req.params.roomId });
 });
 
 io.on('connection', function(socket) {
-
     socket.on('join-room', (roomId, userId) => {
         socket.join(roomId);
         socket.join(userId);
@@ -215,19 +284,39 @@ io.on('connection', function(socket) {
             var user = getUserInRoom(roomId);
             console.log(user);
             console.log(username);
-            // var userData;
             var flag = 0;
             for(var i=0; i<user.length; i++) {
                 if(user[i].username.trim() === username.trim()) {
                     userData = user[i];
                     flag = 1;
+                }
+                if(user[i].id === userId) {
+                    usercurrent = user[i];
+                }
+            }
+            if(flag == 0) {
+                console.log("Not found");
+            } else {
+                console.log(userData.username, usercurrent.username);
+                socket.emit('user-data', userData, usercurrent);
+            }
+        })
+
+        socket.on('my-profile', function(roomId) {
+            var user = getUserInRoom(roomId);
+            var flag = 0;
+            // var mydata;
+            for(var i=0; i<user.length; i++) {
+                if(user[i].id === userId) {
+                    usercurrent = user[i];
+                    flag=1;
                     break;
                 }
             }
             if(flag == 0) {
                 console.log("Not found");
             } else {
-                socket.emit('user-data', userData);
+                socket.emit('my-data', usercurrent);
             }
         })
 

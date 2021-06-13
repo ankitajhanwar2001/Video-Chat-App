@@ -1,0 +1,21 @@
+body {
+    background-image:url(https://wallpapercave.com/wp/bYp71HX.jpg);
+}
+
+.card {
+  box-shadow: 5px 10px 8px 1px rgb(0, 0, 0);
+  margin: auto;
+  text-align: center;
+  font-family: arial;
+}
+
+.title {
+  color: grey;
+  font-size: 18px;
+}
+
+img {
+  width: 200px;
+border-radius: 50%;
+background-color: black;
+}

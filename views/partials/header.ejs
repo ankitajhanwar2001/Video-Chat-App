@@ -17,16 +17,47 @@
                 </div>
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="/">Home</a></li>
-                    <!-- <li><a href="#">Page 1</a></li>
-                    <li><a href="#">Page 2</a></li> -->
                 </ul>
+                <% if(newUser) { %>
+                  <ul class="nav navbar-nav" style="padding-left: 2px;">
+                      <li class="active"><a href="/join">Join</a></li>
+                  </ul>
+                <% } %>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+
+                  <% if(!newUser) { %>
+                      <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                      <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                  <% } else { %>
+                      <!-- <li class="nav-item">
+                          <a class="nav-link" href="#" style="color: black">Logged in as <%= newUser.username %></a>
+                      </li> -->
+                      <li><a href="#">
+                        <span class="glyphicon glyphicon-user"></span> 
+                        <%= newUser.username %>
+                      </a></li>
+                      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+                  <% } %>
+
+                    <!-- <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
                     <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                    <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                    <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li> -->
                 </ul>
             </div>
         </nav>
+
+        <div class="container">
+            <% if(error && error.length>0) { %>
+                <div class="alert alert-danger" role="alert">
+                    <%= error %>
+                </div>
+            <% } %>
+            <% if(success && success.length>0) { %>
+                <div class="alert alert-success" role="alert">
+                    <%= success %>
+                </div>
+            <% } %>
+        </div>
 
         <style>
             body {
