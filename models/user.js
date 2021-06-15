@@ -6,6 +6,7 @@ var UserSchema = new mongoose.Schema({
     lastname: String,
     username: String,
     email: String,
+    profileUrl: String,
     password: String
 });
 

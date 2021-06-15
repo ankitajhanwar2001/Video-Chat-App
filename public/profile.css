@@ -16,6 +16,7 @@ body {
 
 img {
   width: 200px;
-border-radius: 50%;
-background-color: black;
+  height: 230px;
+  border-radius: 50%;
+  background-color: black;
 }

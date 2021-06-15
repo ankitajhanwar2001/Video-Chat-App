@@ -15,22 +15,13 @@
 
 <link rel="stylesheet" href="index_style.css">
 
-<!-- <script type="text/javascript">
-  function uploadImage() {
-    var x = document.createElement("INPUT");
-    x.setAttribute("type", "file");
-    document.body.appendChild(x);
-    console.log(x);
-  }
-</script> -->
-
 <div class="container">
     <br/>
     <b id="login-name"><center>Register</center> </b>
 
     <div class="row">
         <div class="col-md-6 col-md-offset-3" id="login">
-            <form action="/register" method="POST">
+            <form action="/register" method="POST" enctype="multipart/form-data">
 
                 <div class="form-group">
                     <label class="user"> FirstName  </label>
@@ -64,7 +55,14 @@
                     </div>
                 </div>
 
-                <!-- <button onclick="uploadImage()">Try it</button> -->
+                <div class="form-group">
+                    <label class="user"> Image  </label>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="iconn"> <i class="glyphicon glyphicon-picture"></i></span>
+                        <span class="form-control" id="check" style="width: 80.5%; border-radius: 4px; color: #808080cf;">No file uploaded</span>
+                        <input type="file" id="myImg" name="image" placeholder="Upload an image" value="upload" onchange="Uploaded()" style="width: 75px; padding-top: 5px;">
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <label class="user"> Password </label>
@@ -89,5 +87,12 @@
         </div>
 	</div>
 </div>
+
+<script type="text/javascript">
+  function Uploaded() {
+    document.getElementById('check').innerHTML = 'File Uploaded <span class="glyphicon glyphicon-saved"></span>';
+    // document.getElementById('myImg').value;
+  }
+</script>
 
 <%- include("partials/footer") %>

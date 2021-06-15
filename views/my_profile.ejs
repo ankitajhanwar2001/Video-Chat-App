@@ -7,7 +7,9 @@
   <body>
     <h2 style="text-align:center; color: white; font-size: 40px;">My Profile</h2>
     <div class="card" style="background-color: white; width: 500px; height: 500px; padding-top: 40px;">
-      <img src="https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg" alt="John">
+      <img src="./../<%= user.profileUrl %>" alt="<%= user.firstname %> <%= user.lastname %>">
+
+      <!-- <img src="https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg" alt="John"> -->
       <h1><%= user.firstname %> <%= user.lastname %></h1>
       <p class="title">Username: <%= user.username %></p>
       <p>Email: <%= user.email %></p>

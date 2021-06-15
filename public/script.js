@@ -50,6 +50,19 @@ const myPeer = new Peer(undefined, {
 })
 
 var myVideo = document.createElement('video');
+// if(videoGrid.children.length > 1) {
+//   myVideo.style.width = '300px';
+//   myVideo.style.height = '200px';
+// }
+
+var w = '400';
+var h = '300';
+
+socket.on('profile-image', function(user) {
+    console.log(user.profileUrl);
+    document.querySelector('.profileImage').srcset = `/${ user.profileUrl }`;
+})
+
 myVideo.muted = true;
 
 navigator.mediaDevices.getUserMedia({
@@ -57,6 +70,7 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then(function(stream) {
     myVideoStream = stream;
+    console.log("&&&&&   ", stream);
     myVideo.muted = true;
     addVideoStream(myVideo, stream);
     console.log('Oh yeah');
@@ -65,14 +79,29 @@ navigator.mediaDevices.getUserMedia({
         call.answer(stream);
         console.log("you there");
         const video = document.createElement('video');
+        // w-=30;
+        // h-=30;
+        // myVideo.style.width = `${w}px`;
+        // myVideo.style.height = `${h}px`;
+        // video.style.width = `${w}px`;
+        // video.style.height = `${h}px`;
+
+        // for(var i = 0; i < videoGrid.children.length; i++) {
+        //   videoGrid.children[i].style.width = `${w}px`;
+        //   videoGrid.children[i].style.height = `${h}px`;
+        // }
+
         console.log(video.muted);
         call.on('stream', (userVideoStream) => {
             console.log("come in");
+            console.log("%%%%%   ", userVideoStream);
             addVideoStream(video, userVideoStream);
         });
     })
 
-    socket.on('user-connected', function(userId) {
+    socket.on('user-connected', function(userId, user) {
+        // console.log(user.profileUrl);
+        // document.querySelector('.profileImage').srcset = `/${ user.profileUrl }`;
         console.log("user connected");
         console.log(myVideo.muted);
         connectToNewUser(userId, stream);
@@ -125,7 +154,7 @@ socket.on('no-of-participants', function({ room, users }) {
 socket.on('user-data', function(user, currentuser) {
     console.log(user);
     if(user.username != currentuser.username)
-    window.open('/user', '_blank');
+    window.open('/user/' + user.id, '_blank');
 })
 
 // Current User data
@@ -163,6 +192,12 @@ socket.on('user-disconnected', userId => {
     peers[userId].close();
 })
 
+function leave() {
+    console.log(userID);
+    socket.emit("user-disconnecting", userID);
+    location.href='/';
+}
+
 myPeer.on('open', function(id) {
     userID = id;
     socket.emit('join-room', ROOM_ID, id);
@@ -171,6 +206,18 @@ myPeer.on('open', function(id) {
 function connectToNewUser(userId, stream) {
     const call = myPeer.call(userId, stream);
     const video = document.createElement('video');
+    // w-=30;
+    // h-=30;
+    // myVideo.style.width = `${w}px`;
+    // myVideo.style.height = `${h}px`;
+    // video.style.width = `${w}px`;
+    // video.style.height = `${h}px`;
+
+    // for(var i = 0; i < videoGrid.children.length; i++) {
+    //   videoGrid.children[i].style.width = `${w}px`;
+    //   videoGrid.children[i].style.height = `${h}px`;
+    // }
+
     call.on('stream', (userVideoStream) => {
         console.log("yohoo");
         addVideoStream(video, userVideoStream);
@@ -295,12 +342,6 @@ function myProfile() {
   socket.emit('my-profile', ROOM_ID);
 }
 
-function leave() {
-    console.log(userID);
-    socket.emit("user-disconnecting", userID);
-    location.href='/';
-}
-
 function invite(e) {
     link.value = e.baseURI;
     code.value = ROOM_ID;
@@ -401,6 +442,7 @@ function User(e) {
 function UserProfile(e) {
     console.log(userdata);
     var user = userdata;
+    console.log(user);
     socket.emit('user-profile', ROOM_ID, user);
 }
 

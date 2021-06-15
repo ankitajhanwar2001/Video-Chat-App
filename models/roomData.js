@@ -1,8 +1,9 @@
 var users = [];
 var rooms = [];
 
-const addUser = function({ id, firstname, lastname, username, email, room }) {
-    const user = { id, firstname, lastname, username, email, room };
+const addUser = function({ id, firstname, lastname, username, email, profileUrl, room }) {
+    console.log(profileUrl);
+    const user = { id, firstname, lastname, username, email, profileUrl, room };
     users.push(user);
     return { user };
 }

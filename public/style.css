@@ -2,8 +2,8 @@
 
 body {
   background-image: url(https://wallpapercave.com/wp/bYp71HX.jpg);
-  overflow-y: hidden;
-  overflow-x: hidden;
+  /* overflow-y: hidden; */
+  /* overflow-x: hidden; */
 }
 
 :root {

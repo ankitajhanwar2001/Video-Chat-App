@@ -6,8 +6,9 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var methodOverride = require('method-override');
 var mongoose = require('mongoose');
+var multer = require('multer');
+var path = require('path');
 
-// app.use(flash());
 var middleware = require('./middleware/index');
 var generatedMessage = require('./models/message');
 var User = require('./models/user.js');
@@ -30,12 +31,38 @@ let usercurrent;
 let userCurrent;
 const { addUser, removeUser, getUser, getUserInRoom, addRoom, removeRoom, roomFind } = require("./models/roomData");
 
+var storage=multer.diskStorage({
+    destination: './public/uploads/',
+    filename: function(req, file, cb){
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+})
+
+var upload=multer({
+    storage:storage,
+    limits:{
+        fileSize:1024*1024*5,
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+          cb(null, true);
+        } else {
+          cb(null, false);
+          return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+        }
+      }
+}).single('image');
+
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb'}));
+
 app.use(require('express-session')({
     secret: 'Heyy',
     resave: false,
     saveUninitialize: false
 }));
 app.use(flash());
+app.use("/uploads",express.static("uploads"));
 
 app.use(function(req, res, next) {
     res.locals.newUser = req.user;
@@ -62,6 +89,7 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+
 // ROUTES
 // var indexRoutes = require('./public/index');
 // var serverRoutes = require('./public/server');
@@ -86,34 +114,51 @@ app.get('/register', function(req, res) {
 
 app.post('/register', function(req, res) {
     // currentUsername = req.body.username;
-    console.log(req.user);
-    userCurrent = req.user;
-    console.log(userCurrent);
-    console.log(req.body);
-    var user = {
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        username: req.body.username,
-        email: req.body.email,
-    }
-    currentUsername = user;
-    var newUser = new User(user);
-    User.register(newUser, req.body.password, function(err, user) {
-        if(err) {
-            console.log("Error");
-            if(newUser.username.length == 0) {
-                req.flash("error", "Invalid username");
-            } else if(req.body.password.length == 0) {
-                req.flash("error", "Invalid password");
+
+    upload(req, res, (err) => {
+      if(err) {
+        console.log("Error");
+        req.flash("error", "Something went wrong.");
+      } else {
+        console.log("%%%%");
+        console.log(req.file);
+            console.log("&&&&&&&&&");
+            console.log(req.body);
+            var url;
+            if(req.file == undefined) {
+              url = 'uploads/no_profile_picture.jpg';
             } else {
-                req.flash("error", "A user with the given username is already registered");
+            // req.file.filename = 'no_profile_picture.jpg';
+              url = `uploads/${req.file.filename}`;
             }
-            res.redirect('/register');
-        }
-        passport.authenticate('local')(req, res, function() {
-            req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
-            res.redirect('/join');
-        })
+            console.log(req.file);
+            var user = {
+                firstname: req.body.firstname,
+                lastname: req.body.lastname,
+                username: req.body.username,
+                email: req.body.email,
+                profileUrl: url
+            }
+            var newUser = new User(user);
+            User.register(newUser, req.body.password, function(err, user) {
+                if(err) {
+                    console.log("Error");
+                    if(newUser && newUser.username.length == 0) {
+                        req.flash("error", "Invalid username");
+                    } else if(newUser && req.body.password.length == 0) {
+                        req.flash("error", "Invalid password");
+                    } else {
+                        req.flash("error", "A user with the given username is already registered");
+                    }
+                    res.redirect('/register');
+                }
+                passport.authenticate('local')(req, res, function() {
+                    currentUsername = user;
+                    req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
+                    res.redirect('/join');
+                })
+            })
+          }
     })
 })
 
@@ -173,8 +218,9 @@ app.post('/joinExisting', middleware.isLoggedIn, function(req, res) {
     }
 })
 
-app.get('/user', function(req, res) {
-    res.render('user_profile', { user: userData });
+app.get('/user/:id', function(req, res) {
+    var user = getUser(req.params.id);
+    res.render('user_profile', { user: user });
 })
 
 app.get('/myprofile/:id', function(req, res) {
@@ -224,25 +270,28 @@ app.get('/:roomId', middleware.isLoggedIn, function (req, res) {
 });
 
 io.on('connection', function(socket) {
+    console.log("@@@@   ", currentUsername);
+    socket.emit('profile-image', currentUsername);
     socket.on('join-room', (roomId, userId) => {
+
         socket.join(roomId);
         socket.join(userId);
-
-        io.to(roomId).emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
-
+        console.log("%%%%%%     "+currentUsername);
         const { rooms } = addRoom(roomId);
-        const { error, user } = addUser({
+        const { user } = addUser({
             id: userId,
             firstname: currentUsername.firstname,
             lastname: currentUsername.lastname,
             username: currentUsername.username,
             email: currentUsername.email,
+            profileUrl: currentUsername.profileUrl,
             room: roomId
         })
 
-
-        socket.broadcast.to(roomId).emit('user-connected', userId);
-        socket.broadcast.to(roomId).emit('newMessage', generatedMessage('Admin', currentUsername.firstname + ' ' + currentUsername.lastname + ' joined'));
+        // socket.to(roomId).emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
+        socket.broadcast.to(roomId).emit('user-connected', userId, user);
+        // socket.emit('profile-image', user);
+        socket.broadcast.to(roomId).emit('alert-message', currentUsername.firstname + ' ' + currentUsername.lastname + ' joined');
 
         socket.on('createMessage', function(message, callback) {
             if(message!='') {
@@ -335,6 +384,7 @@ io.on('connection', function(socket) {
                     })
                 }
                 socket.broadcast.to(roomId).emit('user-disconnected', userId);
+                socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' left');
             })
         })
 
@@ -351,6 +401,7 @@ io.on('connection', function(socket) {
                 })
             }
             socket.broadcast.to(roomId).emit('user-disconnected', userId);
+            socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' left');
         })
 
     });
