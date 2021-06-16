@@ -58,6 +58,7 @@ var myVideo = document.createElement('video');
 var w = '400';
 var h = '300';
 
+
 socket.on('profile-image', function(user) {
     console.log(user.profileUrl);
     document.querySelector('.profileImage').srcset = `/${ user.profileUrl }`;
@@ -200,7 +201,9 @@ function leave() {
 
 myPeer.on('open', function(id) {
     userID = id;
-    socket.emit('join-room', ROOM_ID, id);
+    // var user = document.getElementById('newUser').value;
+    // console.log("$$$     "+user);
+    socket.emit('join-room', ROOM_ID, id, currentUser);
 })
 
 function connectToNewUser(userId, stream) {
@@ -413,17 +416,18 @@ closeSpan.onclick = function() {
 function searchNames() {
     var filter, a, i, txtValue;
     var input = document.getElementById("search-names");
-    var ul = document.getElementById("names-of-participants");
-    var li = ul.getElementsByTagName("li");
+    var ul = document.getElementById("names-of-participants").children;
+    // var li = ul.getElementsByTagName("li");
     filter = input.value.toUpperCase();
 
-    for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
+    for (i = 0; i < ul.length; i++) {
+        // a = ul[i].getElementsByTagName("a")[0];
+        var name = ul[i].textContent.split(' ')[1] + " " + ul[i].textContent.split(' ')[2]
+        // txtValue = a.textContent || a.innerText;
+        if (name.toUpperCase().indexOf(filter) > -1) {
+            ul[i].style.display = "";
         } else {
-            li[i].style.display = "none";
+            ul[i].style.display = "none";
         }
     }
 }

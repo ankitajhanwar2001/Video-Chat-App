@@ -1,6 +1,6 @@
 <%- include("partials/header") %>
 
-<link rel="stylesheet" href="join.css">
+<link rel="stylesheet" href="./../join.css">
 
 <div class="row">
   <div class="col-sm-3" id="column1">
@@ -13,12 +13,12 @@
       pariatur. Excepteur sint occaecat cupidatat non proident, sunt<br> in culpa
       qui officia deserunt mollit anim id est laborum.</p>
 
-    <form action='/join' method="POST" id="form1">
+    <form action='/<%= user._id %>/join' method="POST" id="form1">
         <button id="btn1" class="btn btn-success">Create a new meeting</button>
     </form>
-    <form action='/joinExisting' method="POST" id="form2">
+    <form action='/<%= user._id %>/joinExisting' method="POST" id="form2">
       <span> OR </span>
-        <input class="form-rounded" type="text" name="existingRoom" placeholder="Join a meeting">
+        <input class="form-rounded" type="text" name="existingRoom" placeholder="Enter a code">
         <button class="btn btn-success" id="btn2">Join</button>
     </form>
   </div>

@@ -2,11 +2,18 @@
 <html lang="en">
   <head>
     <title>Video Chat App</title>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="./../style.css"/>
 
     <script>
       const ROOM_ID = "<%= roomId %>";
+      const currentUser = "<%= newUser.username %>";
+      console.log("))))   "+ROOM_ID, currentUser);
     </script>
+
+    <!-- <script>
+      const currentUser = <%= newUser._id %>;
+      console.log("^^^^   "+currentUser);
+    </script> -->
 
     <script src="/socket.io/socket.io.js" defer></script>
     <script src="https://unpkg.com/peerjs@1.2.0/dist/peerjs.min.js"></script>
@@ -14,12 +21,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script> <!-- For rendering templates -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script> <!-- For formatting time -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script> <!-- For parsing our query string -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
     <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
     <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
     <!-- <script src="https://kit.fontawesome.com/c939d0e917.js"></script> -->
     <!-- <script defer src="https://unpkg.com/peerjs@1.2.0/dist/peerjs.min.js"></script> -->
-    <script src="script.js" defer></script>
+    <script src="./../script.js" defer>
+      // var currentUser = "<%= newUser %>";
+    </script>
 
   <style>
   .left-sidenav {
@@ -71,8 +80,10 @@
   color: white;
 }
 
-  </style>
-
+</style>
+</head>
+<body>
+    <!-- <p style="color: white;" id="newUser"> <%= newUser._id %> </p> -->
     <div class="header">
       <div class="logo" style="left: 90px; position: fixed;">
         <h4 style="color: white;">Video Chat App</h4>
@@ -90,9 +101,9 @@
     <div id="myModal" class="modal">
       <div class="modal-content" style="position: fixed; left: 33%; right: 33%;">
         <span class="close">x</span>
-        <p>Invite people:</p>
-        <input type="text" name="link" value="" id="myURL"><br><br>
-        <input type="text" name="code" value="" id="myCode"><br><br>
+        <p>Invite people by sharing room code:</p>
+        <input type="text" name="link" value="" id="myURL"/><br><br>
+        <input type="text" name="code" value="" id="myCode"/><br><br>
         <center>
           <span>
             <button class="btn btn-success" style="text-align: center; padding: 0;" id="copyLinkBtn" onclick="copyLink()">Copy Link</button>
@@ -190,7 +201,7 @@
           </div>
 
           <div class="search-container" style="padding-top: 29px;">
-              <input style="width: 80%; position: static; height: 40px; border-radius: 6px; padding-left: 25px;" type="text" placeholder="Search for names.." onkeyup="searchNames()" title="Type in a name">
+              <input id="search-names" style="width: 80%; position: static; height: 40px; border-radius: 6px; padding-left: 25px;" type="text" placeholder="Search for names.." onkeyup="searchNames()" title="Type in a name">
               <button onclick="searchNames()" style="position: static; width: 10%; height: 40px;" type="submit"><i class="fa fa-search"></i></button>
           </div>
 
@@ -209,7 +220,7 @@
       </div>
       <div class="main__message_container" id="message-container">
         <form id="message-form" style="padding-bottom: 7px;">
-            <input style="width: 23vw; height: 5vh;" type="text" name="message" placeholder="Enter your message here" autocomplete="off">
+            <input style="width: 23vw; height: 5vh; padding-left: 20px;" type="text" name="message" placeholder="Enter your message here" autocomplete="off"/>
             <button class="btn btn-success" style="height: 2vw; background-color: #0da516; text-align: center;" type="submit" id="submitBtn">Send</button>
         </form>
         </div>
@@ -233,7 +244,7 @@
     <div>
       <ul class="ul-names" id="names-of-participants" style="position: static; width: 80%;">
         {{#users}}
-          <li id="names"><a onclick="User(this)" id="dropBtn"> <img style="width: 20px; border-radius: 50%;" src="{{ profileUrl }}"> {{ firstname }} {{ lastname }} <br><span style="display: none;">{{ username }}</span></a></li>
+          <li id="names"><a onclick="User(this)" id="dropBtn"><img style="width: 20px; border-radius: 50%;" src="./../{{ profileUrl }}"> {{ firstname }} {{ lastname }} <br><span style="display: none;">{{ username }}</span></a></li>
         {{/users}}
       </ul>
     </div>

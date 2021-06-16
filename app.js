@@ -120,15 +120,14 @@ app.post('/register', function(req, res) {
         console.log("Error");
         req.flash("error", "Something went wrong.");
       } else {
-        console.log("%%%%");
-        console.log(req.file);
-            console.log("&&&&&&&&&");
-            console.log(req.body);
+        // console.log("%%%%");
+        // console.log(req.file);
+        //     console.log("&&&&&&&&&");
+        //     console.log(req.body);
             var url;
             if(req.file == undefined) {
               url = 'uploads/no_profile_picture.jpg';
             } else {
-            // req.file.filename = 'no_profile_picture.jpg';
               url = `uploads/${req.file.filename}`;
             }
             console.log(req.file);
@@ -155,10 +154,10 @@ app.post('/register', function(req, res) {
                 passport.authenticate('local')(req, res, function() {
                     currentUsername = user;
                     req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
-                    res.redirect('/join');
+                    res.redirect(`/${user._id}/join`);
                 })
             })
-          }
+        }
     })
 })
 
@@ -177,10 +176,10 @@ app.post('/login', passport.authenticate('local', {
             console.log(err);
         } else {
             currentUsername = user[0];
+            res.redirect(`/${user[0]._id}/join`);
             console.log(currentUsername);
         }
     })
-    res.redirect('/join');
 });
 
 // LOGOUT
@@ -191,192 +190,293 @@ app.get('/logout', middleware.isLoggedIn, function(req, res) {
 })
 
 // JOIN
-app.get('/join', middleware.isLoggedIn, function(req, res) {
-  console.log(req.user);
-  console.log(userCurrent);
-    res.render('join.ejs', { user: currentUsername });
+app.get('/:id/join', middleware.isLoggedIn, function(req, res) {
+    // console.log(req.user);
+    // console.log(userCurrent);
+    User.findById(req.params.id, function (err, user) {
+      if(err) {
+        req.flash("error", "Something went wrong.");
+        res.redirect('/');
+      } else {
+        console.log(user);
+        res.render('join.ejs', { user: user });
+      }
+    })
 })
 
-app.post('/join', middleware.isLoggedIn, function(req, res) {
-    var url = uuidV4();
-    res.redirect(`/${ url }`);
+function generateUID() {
+// I generate the UID from two parts here
+// to ensure the random number provide enough bits.
+    var firstPart = (Math.random() * 46656) | 0;
+    var secondPart = (Math.random() * 46656) | 0;
+    firstPart = ("000" + firstPart.toString(36)).slice(-3);
+    secondPart = ("000" + secondPart.toString(36)).slice(-3);
+    return firstPart + secondPart;
+}
+
+app.post('/:id/join', middleware.isLoggedIn, function(req, res) {
+    // console.log("!!   "+req.body);
+    console.log(generateUID());
+    // var url = uuidV4();
+    var url = generateUID();
+    const { rooms } = addRoom(url);
+    res.redirect(`/${req.params.id}/${ url }`);
 })
 
-app.get('/joinExisting', middleware.isLoggedIn, function(req, res) {
+app.get('/:id/joinExisting', middleware.isLoggedIn, function(req, res) {
     // console.log(req.body);
-    res.render('join.ejs');
+    User.findById(req.params.id, function (err, user) {
+      if(err) {
+        req.flash("error", "Something went wrong.");
+        res.redirect('/');
+      } else {
+        console.log(user);
+        res.render('join.ejs', { user: user });
+      }
+    })
 })
 
-app.post('/joinExisting', middleware.isLoggedIn, function(req, res) {
-    console.log(req.body);
+app.post('/:id/joinExisting', middleware.isLoggedIn, function(req, res) {
+    // console.log(req.body);
     var index = roomFind(req.body.existingRoom);
+    console.log(req.body.existingRoom, index);
     if(index != -1) {
-        res.redirect(`/${ req.body.existingRoom }`);
+        res.redirect(`/${req.params.id}/${ req.body.existingRoom }`);
     } else {
         req.flash("error", "Room doesn't exist.");
-        res.redirect('/joinExisting');
+        res.redirect(`/${ req.params.id }/joinExisting`);
     }
 })
 
-app.get('/user/:id', function(req, res) {
-    var user = getUser(req.params.id);
-    res.render('user_profile', { user: user });
+app.get('/user/:id', middleware.isLoggedIn, function(req, res) {
+    // var user = getUser(req.params.id);
+    User.findById(req.params.id, function (err, user) {
+      if(err) {
+        req.flash("error", "Something went wrong.");
+        res.redirect('/');
+      } else {
+        console.log(user);
+        res.render('user_profile', { user: user });
+      }
+    })
 })
 
-app.get('/myprofile/:id', function(req, res) {
-    var user = getUser(req.params.id);
-    console.log(req.params.id);
-    console.log("&&&&&     "+req.user);
-    res.render('my_profile', { user: user });
+app.get('/myprofile/:id', middleware.isLoggedIn, function(req, res) {
+    // var user = getUser(req.params.id);
+    // console.log(req.params.id);
+    // console.log("&&&&&     "+req.user);
+    User.findById(req.params.id, function (err, user) {
+      if(err) {
+        req.flash("error", "Something went wrong.");
+        res.redirect('/');
+      } else {
+        console.log(user);
+        res.render('my_profile', { user: user });
+      }
+    })
 })
 
 //EDIT
-app.get("/profile/:id/edit", function(req, res) {
-    var currentUser = getUser(req.params.id);
-    User.find({ username: currentUser.username }, function(err, user) {
+app.get("/profile/:id/edit", middleware.isLoggedIn, function(req, res) {
+    // var currentUser = getUser(req.params.id);
+    User.findById(req.params.id, function(err, user) {
         if(err) {
             req.flash("error", "Something went wrong");
             console.log(err);
             res.redirect("/");
         } else {
-            res.render("edit_profile", { user: user[0], id: req.params.id });
+            res.render("edit_profile", { user: user, id: req.params.id });
         }
     });
 
 });
 
 //UPDATE
-app.put("/profile/:id", function(req, res) {
+app.put("/profile/:id", middleware.isLoggedIn, function(req, res) {
     // res.send(req.body);
     console.log(req.params.id);
     // res.redirect('/');
-    var currentUser = getUser(req.params.id);
+    // var currentUser = getUser(req.params.id);
     // console.log("######3   "+currentUser);
-    User.findOneAndUpdate({ username: currentUser.username }, req.body, function(err, user) {
+    User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
         if(err) {
           req.flash("error", "Something went wrong");
         } else {
-            currentUser.firstname = req.body.firstname;
-            currentUser.lastname = req.body.lastname;
-            currentUser.username = req.body.username;
-            currentUser.email = req.body.email;
-            res.render('my_profile', { user: currentUser });
+            user.firstname = req.body.firstname;
+            user.lastname = req.body.lastname;
+            user.username = req.body.username;
+            user.email = req.body.email;
+            res.render('my_profile', { user: user });
         }
     });
 });
 
-app.get('/:roomId', middleware.isLoggedIn, function (req, res) {
-    res.render('room', { roomId: req.params.roomId });
+app.get('/:id/:roomId', middleware.isLoggedIn, function (req, res) {
+    User.findById(req.params.id, function (err, user) {
+      if(err) {
+        req.flash("error", "Room doesn't exist.");
+        res.redirect(`/${req.params.id}/join`);
+      } else {
+        var index = roomFind(req.params.roomId);
+        if(index != -1) {
+            res.render('room', { roomId: req.params.roomId, user: user });
+        } else {
+            req.flash("error", "Room doesn't exist.");
+            res.redirect(`/${req.params.id}/join`);
+        }
+      }
+    })
 });
 
 io.on('connection', function(socket) {
-    console.log("@@@@   ", currentUsername);
-    socket.emit('profile-image', currentUsername);
-    socket.on('join-room', (roomId, userId) => {
+    // console.log(socket);
+    // console.log("@@@@   ", currentUsername);
+    socket.on('join-room', function(roomId, userId, user_id) {
+        var new_user;
+        var op = 0;
+        console.log(user_id);
+        user_id = String(user_id);
+        // console.log(User.getUser(user_id));
+        User.find({ username: user_id }, function (err, user) {
+          if(err) {
+            console.log("$$$$");
+            console.log("Error");
+          } else {
+            console.log("%%%%");
 
-        socket.join(roomId);
-        socket.join(userId);
-        console.log("%%%%%%     "+currentUsername);
-        const { rooms } = addRoom(roomId);
-        const { user } = addUser({
-            id: userId,
-            firstname: currentUsername.firstname,
-            lastname: currentUsername.lastname,
-            username: currentUsername.username,
-            email: currentUsername.email,
-            profileUrl: currentUsername.profileUrl,
-            room: roomId
-        })
-
-        // socket.to(roomId).emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
-        socket.broadcast.to(roomId).emit('user-connected', userId, user);
-        // socket.emit('profile-image', user);
-        socket.broadcast.to(roomId).emit('alert-message', currentUsername.firstname + ' ' + currentUsername.lastname + ' joined');
-
-        socket.on('createMessage', function(message, callback) {
-            if(message!='') {
-                var user = getUser(userId);
-                var name = user.firstname + " " + user.lastname;
-                io.to(roomId).emit('newMessage', generatedMessage(name, message));
-            }
-            callback();
-        })
-
-        io.to(roomId).emit('no-of-participants', {
-            room: roomId,
-            users: getUserInRoom(roomId)
-        })
-
-        // Contacting specific user
-        socket.on('sending-to-user', function(roomId, username, message) {
-            var user = getUserInRoom(roomId);
-            var data;
-            var flag = 0;
-            console.log(username);
-            console.log("bbv  "+ username);
-            for(var i=0; i<user.length; i++) {
-                if(user[i].username.trim() === username.trim()) {
-                    data = user[i];
-                    flag = 1;
-                    break;
-                }
-            }
-            if(flag == 0) {
-                console.log("Not found");
-            } else {
-                if(userId != data.id)
-                io.to(data.id).emit('alert-message', message);
-            }
-        })
-
-        socket.on('user-profile', function(roomId, username) {
-            var user = getUserInRoom(roomId);
             console.log(user);
-            console.log(username);
-            var flag = 0;
-            for(var i=0; i<user.length; i++) {
-                if(user[i].username.trim() === username.trim()) {
-                    userData = user[i];
-                    flag = 1;
-                }
-                if(user[i].id === userId) {
-                    usercurrent = user[i];
-                }
-            }
-            if(flag == 0) {
-                console.log("Not found");
-            } else {
-                console.log(userData.username, usercurrent.username);
-                socket.emit('user-data', userData, usercurrent);
-            }
-        })
+            new_user = user[0];
+            console.log(new_user);
 
-        socket.on('my-profile', function(roomId) {
-            var user = getUserInRoom(roomId);
-            var flag = 0;
-            // var mydata;
-            for(var i=0; i<user.length; i++) {
-                if(user[i].id === userId) {
-                    usercurrent = user[i];
-                    flag=1;
-                    break;
-                }
-            }
-            if(flag == 0) {
-                console.log("Not found");
+            if(new_user == undefined) {
+              console.log(new_user);
+              console.log("&&&&&&");
+              console.log("Error");
             } else {
-                socket.emit('my-data', usercurrent);
-            }
-        })
 
-        socket.on("user-disconnecting", function(userId) {
+            socket.join(roomId);
+            socket.join(userId);
+            // console.log("%%%%%%     "+currentUsername);
+            // const { rooms } = addRoom(roomId);
+            const { user } = addUser({
+                id: new_user._id,
+                userId: userId,
+                firstname: new_user.firstname,
+                lastname: new_user.lastname,
+                username: new_user.username,
+                email: new_user.email,
+                profileUrl: new_user.profileUrl,
+                room: roomId
+            })
+
+            socket.emit('profile-image', user);
+
+            // socket.to(roomId).emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
+            socket.broadcast.to(roomId).emit('user-connected', userId, user);
+            // socket.emit('profile-image', user);
+            socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' joined');
+
+            socket.on('createMessage', function(message, callback) {
+                if(message!='') {
+                    var user = getUser(userId);
+                    var name = user.firstname + " " + user.lastname;
+                    io.to(roomId).emit('newMessage', generatedMessage(name, message));
+                }
+                callback();
+            })
+
+            io.to(roomId).emit('no-of-participants', {
+                room: roomId,
+                users: getUserInRoom(roomId)
+            })
+
+            // Contacting specific user
+            socket.on('sending-to-user', function(roomId, username, message) {
+                var user = getUserInRoom(roomId);
+                var data;
+                var flag = 0;
+                console.log(username);
+                console.log("bbv  "+ username);
+                for(var i=0; i<user.length; i++) {
+                    if(user[i].username.trim() === username.trim()) {
+                        data = user[i];
+                        flag = 1;
+                        break;
+                    }
+                }
+                if(flag == 0) {
+                    console.log("Not found");
+                } else {
+                    if(userId != data.userId)
+                    io.to(data.userId).emit('alert-message', message);
+                }
+            })
+
+            socket.on('user-profile', function(roomId, username) {
+                var user = getUserInRoom(roomId);
+                console.log(user);
+                console.log(username);
+                var flag = 0;
+                for(var i=0; i<user.length; i++) {
+                    if(user[i].username.trim() === username.trim()) {
+                        userData = user[i];
+                        flag = 1;
+                    }
+                    if(user[i].userId === userId) {
+                        usercurrent = user[i];
+                    }
+                }
+                if(flag == 0) {
+                    console.log("Not found");
+                } else {
+                    // console.log(userData.username, usercurrent.username);
+                    socket.emit('user-data', userData, usercurrent);
+                }
+            })
+
+            socket.on('my-profile', function(roomId) {
+                var user = getUserInRoom(roomId);
+                var flag = 0;
+                // var mydata;
+                for(var i=0; i<user.length; i++) {
+                    if(user[i].userId === userId) {
+                        usercurrent = user[i];
+                        flag=1;
+                        break;
+                    }
+                }
+                if(flag == 0) {
+                    console.log("Not found");
+                } else {
+                    socket.emit('my-data', usercurrent);
+                }
+            })
+
+            socket.on("user-disconnecting", function(userId) {
+                socket.on('disconnect', function() {
+                    // console.log(io.sockets.adapter.rooms.get(roomId));
+                    if(io.sockets.adapter.rooms.get(roomId) == undefined) {
+                        var room = removeRoom(roomId);
+                    }
+                    var user = removeUser(userId);
+
+                    if(user) {
+                        io.to(user.room).emit('no-of-participants', {
+                            room: roomId,
+                            users: getUserInRoom(roomId)
+                        })
+                        socket.broadcast.to(roomId).emit('user-disconnected', userId);
+                        socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' left');
+                    }
+                })
+            })
+
             socket.on('disconnect', function() {
-                // console.log(io.sockets.adapter.rooms.get(roomId));
+                // console.log(io.sockets.adapter.rooms.get(roomId).size);
                 if(io.sockets.adapter.rooms.get(roomId) == undefined) {
                     var room = removeRoom(roomId);
                 }
                 var user = removeUser(userId);
-
                 if(user) {
                     io.to(user.room).emit('no-of-participants', {
                         room: roomId,
@@ -386,26 +486,151 @@ io.on('connection', function(socket) {
                 socket.broadcast.to(roomId).emit('user-disconnected', userId);
                 socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' left');
             })
-        })
+          }
 
-        socket.on('disconnect', function() {
-            // console.log(io.sockets.adapter.rooms.get(roomId).size);
-            if(io.sockets.adapter.rooms.get(roomId) == undefined) {
-                var room = removeRoom(roomId);
-            }
-            var user = removeUser(userId);
-            if(user) {
-                io.to(user.room).emit('no-of-participants', {
-                    room: roomId,
-                    users: getUserInRoom(roomId)
-                })
-            }
-            socket.broadcast.to(roomId).emit('user-disconnected', userId);
-            socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' left');
+          }
         })
+      //   if(new_user == undefined) {
+      //     console.log(new_user);
+      //     console.log("&&&&&&");
+      //     console.log("Error");
+      //   } else {
+      //
+      //   socket.join(roomId);
+      //   socket.join(userId);
+      //   // console.log("%%%%%%     "+currentUsername);
+      //   const { rooms } = addRoom(roomId);
+      //   const { user } = addUser({
+      //       id: new_user._id,
+      //       userId: userId,
+      //       firstname: new_user.firstname,
+      //       lastname: new_user.lastname,
+      //       username: new_user.username,
+      //       email: new_user.email,
+      //       profileUrl: new_user.profileUrl,
+      //       room: roomId
+      //   })
+      //
+      //   socket.emit('profile-image', user);
+      //
+      //   // socket.to(roomId).emit('newMessage', generatedMessage('Admin', 'Welcome to chat app!'));
+      //   socket.broadcast.to(roomId).emit('user-connected', userId, user);
+      //   // socket.emit('profile-image', user);
+      //   socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' joined');
+      //
+      //   socket.on('createMessage', function(message, callback) {
+      //       if(message!='') {
+      //           var user = getUser(userId);
+      //           var name = user.firstname + " " + user.lastname;
+      //           io.to(roomId).emit('newMessage', generatedMessage(name, message));
+      //       }
+      //       callback();
+      //   })
+      //
+      //   io.to(roomId).emit('no-of-participants', {
+      //       room: roomId,
+      //       users: getUserInRoom(roomId)
+      //   })
+      //
+      //   // Contacting specific user
+      //   socket.on('sending-to-user', function(roomId, username, message) {
+      //       var user = getUserInRoom(roomId);
+      //       var data;
+      //       var flag = 0;
+      //       console.log(username);
+      //       console.log("bbv  "+ username);
+      //       for(var i=0; i<user.length; i++) {
+      //           if(user[i].username.trim() === username.trim()) {
+      //               data = user[i];
+      //               flag = 1;
+      //               break;
+      //           }
+      //       }
+      //       if(flag == 0) {
+      //           console.log("Not found");
+      //       } else {
+      //           if(userId != data.id)
+      //           io.to(data.id).emit('alert-message', message);
+      //       }
+      //   })
+      //
+      //   socket.on('user-profile', function(roomId, username) {
+      //       var user = getUserInRoom(roomId);
+      //       console.log(user);
+      //       console.log(username);
+      //       var flag = 0;
+      //       for(var i=0; i<user.length; i++) {
+      //           if(user[i].username.trim() === username.trim()) {
+      //               userData = user[i];
+      //               flag = 1;
+      //           }
+      //           if(user[i].id === userId) {
+      //               usercurrent = user[i];
+      //           }
+      //       }
+      //       if(flag == 0) {
+      //           console.log("Not found");
+      //       } else {
+      //           console.log(userData.username, usercurrent.username);
+      //           socket.emit('user-data', userData, usercurrent);
+      //       }
+      //   })
+      //
+      //   socket.on('my-profile', function(roomId) {
+      //       var user = getUserInRoom(roomId);
+      //       var flag = 0;
+      //       // var mydata;
+      //       for(var i=0; i<user.length; i++) {
+      //           if(user[i].id === userId) {
+      //               usercurrent = user[i];
+      //               flag=1;
+      //               break;
+      //           }
+      //       }
+      //       if(flag == 0) {
+      //           console.log("Not found");
+      //       } else {
+      //           socket.emit('my-data', usercurrent);
+      //       }
+      //   })
+      //
+      //   socket.on("user-disconnecting", function(userId) {
+      //       socket.on('disconnect', function() {
+      //           // console.log(io.sockets.adapter.rooms.get(roomId));
+      //           if(io.sockets.adapter.rooms.get(roomId) == undefined) {
+      //               var room = removeRoom(roomId);
+      //           }
+      //           var user = removeUser(userId);
+      //
+      //           if(user) {
+      //               io.to(user.room).emit('no-of-participants', {
+      //                   room: roomId,
+      //                   users: getUserInRoom(roomId)
+      //               })
+      //           }
+      //           socket.broadcast.to(roomId).emit('user-disconnected', userId);
+      //           socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' left');
+      //       })
+      //   })
+      //
+      //   socket.on('disconnect', function() {
+      //       // console.log(io.sockets.adapter.rooms.get(roomId).size);
+      //       if(io.sockets.adapter.rooms.get(roomId) == undefined) {
+      //           var room = removeRoom(roomId);
+      //       }
+      //       var user = removeUser(userId);
+      //       if(user) {
+      //           io.to(user.room).emit('no-of-participants', {
+      //               room: roomId,
+      //               users: getUserInRoom(roomId)
+      //           })
+      //       }
+      //       socket.broadcast.to(roomId).emit('user-disconnected', userId);
+      //       socket.broadcast.to(roomId).emit('alert-message', user.firstname + ' ' + user.lastname + ' left');
+      //   })
+      // }
 
     });
-
 
 });
 
