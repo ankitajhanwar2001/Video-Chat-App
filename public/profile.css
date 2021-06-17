@@ -2,7 +2,17 @@ body {
     background-image:url(https://wallpapercave.com/wp/bYp71HX.jpg);
 }
 
+h2 {
+  text-align:center;
+  color: white;
+  font-size: 40px;
+}
+
 .card {
+  background-color: white;
+  width: 500px;
+  height: 500px;
+  padding-top: 40px;
   box-shadow: 5px 10px 8px 1px rgb(0, 0, 0);
   margin: auto;
   text-align: center;
@@ -19,4 +29,30 @@ img {
   height: 230px;
   border-radius: 50%;
   background-color: black;
+}
+
+#edit-btn {
+  color: black;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+  display: inline-block;
+  text-decoration: none;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  user-select: none;
+}
+
+#edit-btn:hover {
+  background-color: #6ccd6c;
 }

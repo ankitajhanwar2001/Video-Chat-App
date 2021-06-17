@@ -8,7 +8,7 @@
     </head>
     <body>
 
-        <nav class="navbar navbar-inverse">
+        <nav class="navbar navbar-inverse" style="position: fixed; width: 100%;">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="#">Video Chat App</a>
@@ -22,25 +22,25 @@
                   </ul>
                 <% } %>
                 <ul class="nav navbar-nav navbar-right">
-
                   <% if(!newUser) { %>
                       <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
                       <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
                   <% } else { %>
-                      <!-- <li class="nav-item">
-                          <a class="nav-link" href="#" style="color: black">Logged in as <%= newUser.username %></a>
-                      </li> -->
-                      <li><a href="#">
-                        <span class="glyphicon glyphicon-user"></span> 
+
+                    <li>
+                      <a href="/myprofile/<%= newUser._id %>">
+                        <!-- <span class="glyphicon glyphicon-user"></span> -->
+                        <img src="/<%= newUser.profileUrl %>" style="width: 20px; height: 20px; border-radius: 50%; box-shadow: none;">
                         <%= newUser.username %>
-                      </a></li>
-                      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+                      </a>
+                    </li>
+                    <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
                   <% } %>
                 </ul>
             </div>
         </nav>
 
-        <div class="container">
+        <div style="padding-top: 70px; position: relative;" class="container">
             <% if(error && error.length>0) { %>
                 <div class="alert alert-danger" role="alert">
                     <%= error %>
@@ -55,9 +55,6 @@
 
         <style>
             body {
-                /* background-image:url(https://wallpapertag.com/wallpaper/full/c/a/a/157415-simplistic-wallpapers-1920x1080-lockscreen.jpg); */
                 background-image:url(https://wallpapercave.com/wp/bYp71HX.jpg);
-                /* overflow-y: hidden;
-                overflow-x: hidden; */
             }
         </style>

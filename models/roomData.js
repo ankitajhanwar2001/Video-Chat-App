@@ -2,10 +2,21 @@ var users = [];
 var rooms = [];
 
 const addUser = function({ id, userId, firstname, lastname, username, email, profileUrl, room }) {
-    // console.log(profileUrl);
     const user = { id, userId, firstname, lastname, username, email, profileUrl, room };
     users.push(user);
     return { user };
+}
+
+const updateUser = function({ id, firstname, lastname, username, email }) {
+    for(var i = 0; i < users.length; i++) {
+      if(users[i].id.toString() === id.toString()) {
+        users[i].firstname = firstname;
+        users[i].lastname = lastname;
+        users[i].username = username;
+        users[i].email = email;
+        return users[i];
+      }
+    }
 }
 
 const removeUser = function(id) {
@@ -17,9 +28,9 @@ const removeUser = function(id) {
     }
 }
 
-const getUser = function(id) {
+const getUser = function(userId) {
     return users.find(function(user) {
-        return user.userId === id;
+        return user.userId === userId;
     })
 }
 
@@ -30,7 +41,6 @@ const getUserInRoom = function(room) {
 }
 
 const addRoom = function(roomId) {
-    console.log(roomId);
     rooms.push(roomId);
     return roomId;
 }
@@ -53,6 +63,7 @@ const roomFind = function(id) {
 
 module.exports = {
     addUser,
+    updateUser,
     removeUser,
     getUser,
     getUserInRoom,

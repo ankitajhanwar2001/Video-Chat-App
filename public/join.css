@@ -1,5 +1,4 @@
 body {
-  /* overflow-y: hidden; */
   overflow-x: hidden;
 }
 
@@ -7,25 +6,21 @@ body {
   box-sizing: border-box;
 }
 
-/* .column {
-  float: left;
-  width: 33.33%;
-  padding: 5px;
-} */
-
 h2 {
   padding-left: 5rem;
   color:white;
 }
 
 #column1 {
+  position: static;
+  padding-top: 200px;
   width: auto;
-  padding-top: 120px;
 }
 
 #column2 {
+  position: static;
   padding-right: 35px;
-  padding-top: 120px;
+  padding-top: 180px;
 }
 
 #form2 {
@@ -54,7 +49,7 @@ input {
   text-align: center;
 }
 
-span {
+#or {
    color: white;
    padding-right: 2rem;
    padding-left: 2rem;
@@ -73,4 +68,5 @@ p {
 img {
   width: 100%;
   box-shadow: 5px 10px 8px 5px black;
+  position: static;
 }

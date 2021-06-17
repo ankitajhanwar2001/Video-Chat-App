@@ -14,9 +14,7 @@ var messageFormValue = messageForm.querySelector('input');
 // INVITE MODAL
 var modal = document.getElementById("myModal");
 var span = document.getElementsByClassName("close")[0];
-var link = document.getElementById("myURL");
 var code = document.getElementById("myCode");
-var linkBtn = document.getElementById("copyLinkBtn");
 var codeBtn = document.getElementById("copyCodeBtn");
 
 // ALERT MODAL
@@ -50,17 +48,8 @@ const myPeer = new Peer(undefined, {
 })
 
 var myVideo = document.createElement('video');
-// if(videoGrid.children.length > 1) {
-//   myVideo.style.width = '300px';
-//   myVideo.style.height = '200px';
-// }
-
-var w = '400';
-var h = '300';
-
 
 socket.on('profile-image', function(user) {
-    console.log(user.profileUrl);
     document.querySelector('.profileImage').srcset = `/${ user.profileUrl }`;
 })
 
@@ -71,50 +60,26 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then(function(stream) {
     myVideoStream = stream;
-    console.log("&&&&&   ", stream);
     myVideo.muted = true;
     addVideoStream(myVideo, stream);
-    console.log('Oh yeah');
 
     myPeer.on('call', (call) => {
         call.answer(stream);
-        console.log("you there");
         const video = document.createElement('video');
-        // w-=30;
-        // h-=30;
-        // myVideo.style.width = `${w}px`;
-        // myVideo.style.height = `${h}px`;
-        // video.style.width = `${w}px`;
-        // video.style.height = `${h}px`;
 
-        // for(var i = 0; i < videoGrid.children.length; i++) {
-        //   videoGrid.children[i].style.width = `${w}px`;
-        //   videoGrid.children[i].style.height = `${h}px`;
-        // }
-
-        console.log(video.muted);
         call.on('stream', (userVideoStream) => {
-            console.log("come in");
-            console.log("%%%%%   ", userVideoStream);
             addVideoStream(video, userVideoStream);
         });
     })
 
     socket.on('user-connected', function(userId, user) {
-        // console.log(user.profileUrl);
-        // document.querySelector('.profileImage').srcset = `/${ user.profileUrl }`;
-        console.log("user connected");
-        console.log(myVideo.muted);
         connectToNewUser(userId, stream);
-        console.log('yoyoyoyo');
     })
-
+})
     socket.on('newMessage', function(message) {
-        console.log(message);
         if(mainChat.style.display === "none") {
           document.getElementById('lblCartCount').style.display = 'flex';
           chatNo++;
-          console.log(chatNo);
           if(chatNo == 0) {
             document.getElementById('lblCartCount').style.display = "";
           } else {
@@ -123,7 +88,6 @@ navigator.mediaDevices.getUserMedia({
         } else {
           chatNo = 0;
           document.getElementById('lblCartCount').innerHTML = "";
-          console.log(chatNo);
         }
         const html = Mustache.render(messageTemplate, {
             username: message.from,
@@ -132,10 +96,22 @@ navigator.mediaDevices.getUserMedia({
         });
         messages.insertAdjacentHTML('beforeend', html); //inserting the rendered message to the upper div.
     });
+
+myPeer.on('open', function(id) {
+    socket.emit('join-room', ROOM_ID, id, currentUser);
 })
 
+socket.on('user-disconnected', userId => {
+    if(peers[userId])
+    peers[userId].close();
+})
+
+function leave() {
+    socket.emit("user-disconnecting", userID);
+    location.href='/';
+}
+
 socket.on('no-of-participants', function({ room, users }) {
-    console.log(users);
     var size = users.length;
 
     const html1 = Mustache.render(sizeTemplate, {
@@ -153,20 +129,17 @@ socket.on('no-of-participants', function({ room, users }) {
 
 // Showing user data
 socket.on('user-data', function(user, currentuser) {
-    console.log(user);
     if(user.username != currentuser.username)
     window.open('/user/' + user.id, '_blank');
 })
 
 // Current User data
 socket.on('my-data', function(user) {
-    console.log(user.id);
     window.open('/myprofile/' + user.id, '_blank');
 })
 
 // Alerting specific user
 socket.on('alert-message', function(message) {
-      console.log(notificationNo);
       if(Notificationmodal.style.display === "block") {
         notificationNo = 0;
         document.getElementById('lblCartCount2').style.display = "none";
@@ -179,50 +152,19 @@ socket.on('alert-message', function(message) {
     const html = Mustache.render(notificationTemplate, {
         message
     })
-    // document.getElementById('box-notification').innerHTML +=html;
+
     if(notificationMessage.innerHTML === 'No new notifications.') {
       notificationMessage.innerHTML = html;
     } else {
       notificationMessage.innerHTML += html;
     }
-    // alert(message);
-})
-
-socket.on('user-disconnected', userId => {
-    if(peers[userId])
-    peers[userId].close();
-})
-
-function leave() {
-    console.log(userID);
-    socket.emit("user-disconnecting", userID);
-    location.href='/';
-}
-
-myPeer.on('open', function(id) {
-    userID = id;
-    // var user = document.getElementById('newUser').value;
-    // console.log("$$$     "+user);
-    socket.emit('join-room', ROOM_ID, id, currentUser);
 })
 
 function connectToNewUser(userId, stream) {
     const call = myPeer.call(userId, stream);
     const video = document.createElement('video');
-    // w-=30;
-    // h-=30;
-    // myVideo.style.width = `${w}px`;
-    // myVideo.style.height = `${h}px`;
-    // video.style.width = `${w}px`;
-    // video.style.height = `${h}px`;
-
-    // for(var i = 0; i < videoGrid.children.length; i++) {
-    //   videoGrid.children[i].style.width = `${w}px`;
-    //   videoGrid.children[i].style.height = `${h}px`;
-    // }
 
     call.on('stream', (userVideoStream) => {
-        console.log("yohoo");
         addVideoStream(video, userVideoStream);
     });
     call.on('close', function() {
@@ -237,30 +179,24 @@ function addVideoStream(video, stream) {
     video.addEventListener('loadedmetadata', function() {
         video.play();
     })
-    if(video)
-    {
-        console.log("upljxbx");
+    if(video) {
         videoGrid.append(video);
     }
-    else
-    console.log('Error....');
 }
 
-messageForm.addEventListener('click', function(e) {
+messageFormButton.addEventListener('click', function(e) {
     e.preventDefault(); //prevent from constantly reloading
 
     messageFormButton.setAttribute('disabled','disabled');
 
     socket.emit('createMessage', document.querySelector('input[name="message"]').value, function(error) {
-        if(messageFormValue.value!='')
-        console.log("Message delivered!");
+        if(messageFormValue.value != '')
         messageFormButton.removeAttribute('disabled');
         messageFormValue.value = '';
         messageFormValue.focus();
         if(error) {
             return console.log(error);
         }
-
     });
 })
 
@@ -274,7 +210,6 @@ function showChat() {
         document.getElementsByClassName("main__right")[0].style.flex = 0.3;
         mainParticipants.style.flex = 0;
         mainChat.style.display = "flex";
-
     } else {
         document.getElementsByClassName("main__left")[0].style.flex = 1;
         document.getElementsByClassName("main__right")[0].style.flex = 0;
@@ -287,21 +222,20 @@ function showChat() {
 
 // No. OF PARTICIPANTS
 function participants(e) {
+    socket.emit('update-participants', ROOM_ID);
     if (mainParticipants.style.display === "none") {
         document.getElementsByClassName("main__left")[0].style.flex = 0.7;
+        mainParticipants.style.display = "flex";
         mainParticipants.style.flex = 0.3;
         document.getElementsByClassName("main__right")[0].style.flex = 0;
-        mainParticipants.style.display = "flex";
-
     } else {
         document.getElementsByClassName("main__left")[0].style.flex = 1;
         mainParticipants.style.flex = 0;
-        document.getElementsByClassName("main__right")[0].style.flex = 0;
         mainParticipants.style.display = "none";
+        document.getElementsByClassName("main__right")[0].style.flex = 0;
     }
     document.getElementsByClassName("main__right")[0].style.flex = 0;
     mainChat.style.display = "none";
-    // document.getElementById('message-container').style.display = 'none';
 }
 
 // VIDEO ON/OFF
@@ -321,17 +255,11 @@ function onoffVoice(e) {
     let enabled = myVideoStream.getAudioTracks()[0].enabled;
     console.log(myVideoStream.getTracks(), myVideoStream.getAudioTracks()[0]);
     if (enabled) {
-        console.log(e);
         e.firstElementChild.classList.value = 'fa fa-microphone-slash';
-        // document.getElementById("muteButton").innerHTML = '<i class='fas fa-microphone-slash'></i>';
         myVideo.muted = true;
         myVideoStream.getAudioTracks()[0].enabled = false;
-        // setPlayVideo();
     } else {
-        // setStopVideo();
-        console.log(e);
         e.firstElementChild.classList.value = 'fa fa-microphone';
-        // document.getElementById("muteButton").innerHTML = '<i class='fas fa-microphone'></i>';
         myVideo.muted = true;
         myVideoStream.getAudioTracks()[0].enabled = true;
     }
@@ -346,14 +274,13 @@ function myProfile() {
 }
 
 function invite(e) {
-    link.value = e.baseURI;
+    // link.value = e.baseURI;
     code.value = ROOM_ID;
     modal.style.display = "block";
 }
 
 span.onclick = function() {
     modal.style.display = "none";
-    linkBtn.innerHTML = 'Copy Link';
     codeBtn.innerHTML = 'Copy code';
 }
 
@@ -369,46 +296,28 @@ window.onclick = function(e) {
 
     if (e.target == modal) {
         modal.style.display = "none";
-        linkBtn.innerHTML = 'Copy Link';
         codeBtn.innerHTML = 'Copy code';
     }
 }
 
-function copyLink() {
-    link.select();
-    link.setSelectionRange(0, 99999); /* For mobile devices */
-
-    /* Copy the text inside the text field */
-    document.execCommand("copy");
-
-    linkBtn.innerHTML = 'Copied';
-}
-
 function copyCode() {
     code.select();
-    code.setSelectionRange(0, 99999); /* For mobile devices */
-
-    /* Copy the text inside the text field */
+    code.setSelectionRange(0, 99999);
     document.execCommand("copy");
-
     codeBtn.innerHTML = 'Copied';
 }
 
 function notification() {
-  if(notificationNo != 0) {
-    // notificationMessage.innerHTML = '';
-  } else {
+  if(notificationNo == 0) {
     notificationMessage.innerHTML = 'No new notifications.';
   }
   notificationNo = 0;
-  // document.querySelector('.box').style.display = 'block';
   document.getElementById('lblCartCount2').style.display = 'none';
   Notificationmodal.style.display = "block";
 }
 
 closeSpan.onclick = function() {
     notificationMessage.innerHTML = '';
-    // document.querySelector('.box').style.display = 'none';
     Notificationmodal.style.display = "none";
 }
 
@@ -417,13 +326,10 @@ function searchNames() {
     var filter, a, i, txtValue;
     var input = document.getElementById("search-names");
     var ul = document.getElementById("names-of-participants").children;
-    // var li = ul.getElementsByTagName("li");
     filter = input.value.toUpperCase();
 
     for (i = 0; i < ul.length; i++) {
-        // a = ul[i].getElementsByTagName("a")[0];
-        var name = ul[i].textContent.split(' ')[1] + " " + ul[i].textContent.split(' ')[2]
-        // txtValue = a.textContent || a.innerText;
+        var name = ul[i].textContent.split(' ')[1] + " " + ul[i].textContent.split(' ')[2];
         if (name.toUpperCase().indexOf(filter) > -1) {
             ul[i].style.display = "";
         } else {
@@ -433,8 +339,7 @@ function searchNames() {
 }
 
 function User(e) {
-    console.log(e.text);
-    var user = e.text.split(' ');
+    var user = e.children[0].textContent.split(' ');
     userdata = user[3];
     var username = user[1] + " " + user[2];
     document.getElementById('user-profile').textContent = username + ' Profile';
@@ -444,9 +349,7 @@ function User(e) {
 
 // Displaying Profile
 function UserProfile(e) {
-    console.log(userdata);
     var user = userdata;
-    console.log(user);
     socket.emit('user-profile', ROOM_ID, user);
 }
 

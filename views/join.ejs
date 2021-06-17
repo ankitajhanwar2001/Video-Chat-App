@@ -5,19 +5,18 @@
 <div class="row">
   <div class="col-sm-3" id="column1">
     <h2>Video Call App</h2>
-    <p><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br>
-      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-      nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor <br>
-      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-      pariatur. Excepteur sint occaecat cupidatat non proident, sunt<br> in culpa
-      qui officia deserunt mollit anim id est laborum.</p>
+    <p><br>Video conferencing is a technology that allows users in
+      different locations to hold face-to-face meetings without <br/>
+      having to move to a single location together.
+      This technology is particularly convenient for business <br/>
+      users in different cities or even different countries because
+      it saves time, expenses, and hassles associated with business travel.<br/></p>
 
     <form action='/<%= user._id %>/join' method="POST" id="form1">
         <button id="btn1" class="btn btn-success">Create a new meeting</button>
     </form>
     <form action='/<%= user._id %>/joinExisting' method="POST" id="form2">
-      <span> OR </span>
+      <span id="or"> OR </span>
         <input class="form-rounded" type="text" name="existingRoom" placeholder="Enter a code">
         <button class="btn btn-success" id="btn2">Join</button>
     </form>

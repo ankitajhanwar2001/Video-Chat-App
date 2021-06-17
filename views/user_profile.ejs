@@ -2,18 +2,19 @@
 <html>
 <head>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
 <link rel="stylesheet" href="./../profile.css">
 </head>
 <body>
+  <h2><%= user.firstname %> <%= user.lastname %>'s Profile</h2>
 
-<h2 style="text-align:center; color: white; font-size: 40px;"><%= user.firstname %> <%= user.lastname %>'s Profile</h2>
-
-<div class="card" style="background-color: white; width: 500px; height: 500px; padding-top: 40px;">
-  <img src="./../<%= user.profileUrl %>" alt="<%= user.firstname %> <%= user.lastname %>">
-  <h1><%= user.firstname %> <%= user.lastname %></h1>
-  <p class="title">Username: <%= user.username %></p>
-  <p>Email: <%= user.email %></p>
-</div>
+  <div class="card">
+    <img src="./../<%= user.profileUrl %>" alt="<%= user.firstname %> <%= user.lastname %>">
+    <h1><%= user.firstname %> <%= user.lastname %></h1>
+    <p class="title">Username: <%= user.username %></p>
+    <p>Email: <%= user.email %></p>
+    <a id="edit-btn" class="btn btn-success" href="/">Home</a>
+  </div>
 
 </body>
 </html>
