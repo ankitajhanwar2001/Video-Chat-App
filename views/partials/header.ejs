@@ -13,11 +13,11 @@
                 <div class="navbar-header">
                     <a class="navbar-brand" href="#">Video Chat App</a>
                 </div>
-                <ul class="nav navbar-nav">
+                <ul style="position: absolute; left: 160px;" class="nav navbar-nav">
                     <li class="active"><a href="/">Home</a></li>
                 </ul>
                 <% if(newUser) { %>
-                  <ul class="nav navbar-nav" style="padding-left: 2px;">
+                  <ul style="position: absolute; left: 230px;" class="nav navbar-nav" style="padding-left: 2px;">
                       <li class="active"><a href="/<%= newUser._id %>/join">Join</a></li>
                   </ul>
                 <% } %>
@@ -30,7 +30,7 @@
                     <li>
                       <a href="/myprofile/<%= newUser._id %>">
                         <!-- <span class="glyphicon glyphicon-user"></span> -->
-                        <img src="/<%= newUser.profileUrl %>" style="width: 20px; height: 20px; border-radius: 50%; box-shadow: none;">
+                        <img src="<%= newUser.profileUrl %>" style="width: 20px; height: 20px; border-radius: 50%; box-shadow: none;">
                         <%= newUser.username %>
                       </a>
                     </li>

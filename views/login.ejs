@@ -1,44 +1,141 @@
-<%- include("partials/header") %>
+
 
 <link rel="stylesheet" href="index_style.css">
 
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
-<div class="container">
-    <br/>
-    <b id="login-name"><center>Login Here</center> </b>
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3" id="login">
-            <form action="/login" method="POST">
-                <div class="form-group">
-                    <label class="user"> UserName  </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn"> <i class="glyphicon glyphicon-user"></i></span>
-                        <input type="text" class="form-control" name="username" placeholder="username">
-                    </div>
-                </div>
+<!doctype html>
+<html lang="en">
 
-                <div class="form-group">
-                    <label class="user"> Password </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn1"> <i class="glyphicon glyphicon-lock"></i></span>
-                        <input type="password" class="form-control" name="password" placeholder="Enter Password">
-                    </div>
-                </div>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-                <br/>
-                <div class="form-group">
-                    <input type="submit" class="btn btn-success" value="login">
-                    <input type="reset" class="btn btn-danger" value="reset">
-                </div>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <p>Don't have an account?
-                <a href="/register" style="color: white;"> Register </a></p>
-            </form>
+  <!--  ADD FONTS HERE     -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+  <title>Video Chat App</title>
+  <style>
+    body {
+      overflow-x: hidden;
+    }
+  </style>
+</head>
+
+<body data-spy="scroll" data-target=".navbar" data-offset="50" style="background-image:url(https://wallpapercave.com/wp/bYp71HX.jpg);">
+
+
+  <div class="row">
+    <div class="col-sm-4">
+      <nav class="navbar navbar-expand-sm navbar-dark fixed-top" style="background-color: #222;">
+        <a style="color: white; font-size: 16px;" class="navbar-brand" href="#">
+          Video Call App
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <% if(newUser) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/<%= newUser._id %>/join">Join</a>
+              </li>
+            <% } %>
+            <% if(!newUser) { %>
+                <li class="nav-item" style="position: fixed; right: 100px;">
+                  <span class="glyphicon glyphicon-user"></span>
+                  <a class="nav-link" href="/register">Sign Up</a>
+                </li>
+                <li class="nav-item" style="position: fixed; right: 30px;">
+                  <span class="glyphicon glyphicon-log-in"></span>
+                  <a class="nav-link" href="/login">Login</a>
+                </li>
+            <% } else { %>
+              <li class="nav-item" style="position: fixed; right: 100px;">
+                <a class="nav-link" href="/myprofile/<%= newUser._id %>">
+                  <img src="<%= newUser.profileUrl %>" style="width: 20px; height: 20px; border-radius: 50%; box-shadow: none;">
+                  <p style="display: inline-block; padding-left: 6px;"><%= newUser.username %><p>
+                </a>
+              </li>
+              <li class="nav-item" style="position: fixed; right: 30px;">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <a class="nav-link" href="/logout">Logout</a>
+              </li>
+            <% } %>
+          </ul>
         </div>
-	</div>
-</div>
+      </nav>
+    </div>
 
-<%- include("partials/footer") %>
+    <div class="col-sm-8">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+         <span class="navbar-toggler-icon"></span>
+       </button>
+    </div>
+  </div>
+
+
+
+  <div id="section1" class="container-fluid" style="padding-top:25px;">
+    <div class="container">
+        <% if(error && error.length>0) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= error %>
+            </div>
+        <% } %>
+        <% if(success && success.length>0) { %>
+            <div class="alert alert-success" role="alert">
+                <%= success %>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="container">
+        <br/>
+        <b id="login-name"><center>Login Here</center> </b>
+        <div class="row" style="justify-content: center;">
+            <div class="col-md-6 col-md-offset-3" id="login">
+                <form action="/login" method="POST">
+                    <div class="form-group">
+                        <label class="user"> UserName  </label>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="iconn"> <i style="padding: 10px;" class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" name="username" placeholder="Username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="user"> Password </label>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="iconn1"> <i style="padding: 10px;" class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" name="password" placeholder="Enter Password">
+                        </div>
+                    </div>
+
+                    <br/>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-success" value="login" style="margin-right: 12px;">
+                        <input type="reset" class="btn btn-danger" value="reset">
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <p>Don't have an account?
+                    <a href="/register" style="color: white;"> Register </a></p>
+                </form>
+            </div>
+    	</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

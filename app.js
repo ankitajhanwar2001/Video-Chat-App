@@ -1,5 +1,8 @@
+require('dotenv/config');
+
 const express = require("express");
 const app = express();
+const AWS = require('aws-sdk')
 var flash = require('connect-flash');
 var bodyParser = require('body-parser');
 var passport = require('passport');
@@ -25,8 +28,15 @@ const peerServer = ExpressPeerServer(server, {
 
 const { addUser, updateUser, removeUser, getUser, getUserInRoom, addRoom, removeRoom, roomFind } = require("./models/roomData");
 
-var storage=multer.diskStorage({
-    destination: './public/uploads/',
+const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET
+})
+
+var storage=multer.memoryStorage({
+    destination: function(req, file, callback) {
+        callback(null, '');
+    },
     filename: function(req, file, cb){
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     }
@@ -107,45 +117,96 @@ app.get('/register', function(req, res) {
 
 app.post('/register', function(req, res) {
 
-    upload(req, res, (err) => {
-      if(err) {
-        console.log("Error");
-        req.flash("error", "Something went wrong.");
-      } else {
-        var url;
-        if(req.file == undefined) {
-          url = 'uploads/no_profile_picture.jpg';
-        } else {
-          url = `uploads/${req.file.filename}`;
-        }
-        console.log(req.file);
-        var user = {
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            username: req.body.username,
-            email: req.body.email,
-            profileUrl: url
-        }
-        var newUser = new User(user);
-        User.register(newUser, req.body.password, function(err, user) {
-            if(err) {
-                console.log("Error");
-                if(newUser && newUser.username.length == 0) {
-                    req.flash("error", "Invalid username");
-                } else if(newUser && req.body.password.length == 0) {
-                    req.flash("error", "Invalid password");
-                } else {
-                    req.flash("error", "A user with the given username is already registered");
-                }
-                res.redirect('/register');
-            }
-            passport.authenticate('local')(req, res, function() {
-                req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
-                res.redirect(`/${user._id}/join`);
-            })
-        })
-      }
+  upload(req, res, (err) => {
+     if(err) {
+       console.log("Error");
+       req.flash("error", "Something went wrong.");
+     } else {
+       console.log(req.file);
+
+       let myFile = req.file.originalname.split(".")
+       const fileType = myFile[myFile.length - 1]
+
+       const params = {
+           Bucket: process.env.AWS_BUCKET_NAME,
+           Key: `${uuidV4()}.${fileType}`,
+           Body: req.file.buffer
+       }
+
+       s3.upload(params, (error, data) => {
+           if(error){
+               res.status(500).send(error)
+           } else {
+             var user = {
+                  firstname: req.body.firstname,
+                  lastname: req.body.lastname,
+                  username: req.body.username,
+                  email: req.body.email,
+                  profileUrl: data.Location
+              }
+              var newUser = new User(user);
+              User.register(newUser, req.body.password, function(err, user) {
+                  if(err) {
+                      console.log("Error");
+                      if(newUser && newUser.username.length == 0) {
+                          req.flash("error", "Invalid username");
+                      } else if(newUser && req.body.password.length == 0) {
+                          req.flash("error", "Invalid password");
+                      } else {
+                          req.flash("error", "A user with the given username is already registered");
+                      }
+                      res.redirect('/register');
+                  }
+                  passport.authenticate('local')(req, res, function() {
+                      req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
+                      res.redirect(`/${user._id}/join`);
+                  })
+              })
+           }
+           // res.status(200).send(data.Location)
+       })
+     }
    })
+
+   //  upload(req, res, (err) => {
+   //    if(err) {
+   //      console.log("Error");
+   //      req.flash("error", "Something went wrong.");
+   //    } else {
+   //      var url;
+   //      if(req.file == undefined) {
+   //        url = 'uploads/no_profile_picture.jpg';
+   //      } else {
+   //        url = `uploads/${req.file.filename}`;
+   //      }
+   //      console.log(req.file);
+   //      var user = {
+   //          firstname: req.body.firstname,
+   //          lastname: req.body.lastname,
+   //          username: req.body.username,
+   //          email: req.body.email,
+   //          profileUrl: url
+   //      }
+   //      var newUser = new User(user);
+   //      User.register(newUser, req.body.password, function(err, user) {
+   //          if(err) {
+   //              console.log("Error");
+   //              if(newUser && newUser.username.length == 0) {
+   //                  req.flash("error", "Invalid username");
+   //              } else if(newUser && req.body.password.length == 0) {
+   //                  req.flash("error", "Invalid password");
+   //              } else {
+   //                  req.flash("error", "A user with the given username is already registered");
+   //              }
+   //              res.redirect('/register');
+   //          }
+   //          passport.authenticate('local')(req, res, function() {
+   //              req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
+   //              res.redirect(`/${user._id}/join`);
+   //          })
+   //      })
+   //    }
+   // })
 })
 
 // LOGIN

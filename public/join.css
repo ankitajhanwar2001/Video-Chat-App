@@ -13,14 +13,14 @@ h2 {
 
 #column1 {
   position: static;
-  padding-top: 200px;
+  padding-top: 150px;
   width: auto;
 }
 
 #column2 {
   position: static;
   padding-right: 35px;
-  padding-top: 180px;
+  padding-top: 160px;
 }
 
 #form2 {
@@ -62,7 +62,7 @@ input {
 }
 p {
     color:white;
-    padding-left: 5rem;
+    padding-left: 3rem;
     padding-bottom: 5rem;
 }
 img {

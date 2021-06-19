@@ -63,6 +63,7 @@
         </div>
       </div>
     </div>
+    <div id="sound"></div>
 
     <div id="notificationModal" class="Notificationmodal">
       <div class="notification-modal-content">
@@ -178,7 +179,7 @@
     <div>
       <ul class="ul-names" id="names-of-participants">
         {{#users}}
-          <li id="names"><a id="dropBtn"><img id="participantsImages" src="./../{{ profileUrl }}"> {{ firstname }} {{ lastname }} <i id="dot-icon" onclick="User(this)" class="fa fa-ellipsis-v" aria-hidden="true"><p style="display:none"> {{firstname}} {{lastname}} {{username}}</p></i></a></li>
+          <li id="names"><a id="dropBtn"><img id="participantsImages" src="{{ profileUrl }}"> {{ firstname }} {{ lastname }} <i id="dot-icon" onclick="User(this)" class="fa fa-ellipsis-v" aria-hidden="true"><p style="display:none"> {{firstname}} {{lastname}} {{username}}</p></i></a></li>
         {{/users}}
       </ul>
     </div>

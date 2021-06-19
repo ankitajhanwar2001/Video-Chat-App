@@ -29,6 +29,8 @@ p {
 }
 
 #iconn{
+  width: 30px;
+  text-align: center;
   background-color: #5cb85c;
   border-color: #4cae4c;
   color: white;
@@ -49,7 +51,7 @@ p {
 }
 
 .btn{
-  width: 50%;
+  width: 48%;
   float: left;
   height: 40px;
   font-size: 18px;

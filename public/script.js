@@ -50,7 +50,7 @@ const myPeer = new Peer(undefined, {
 var myVideo = document.createElement('video');
 
 socket.on('profile-image', function(user) {
-    document.querySelector('.profileImage').srcset = `/${ user.profileUrl }`;
+    document.querySelector('.profileImage').srcset = `${ user.profileUrl }`;
 })
 
 myVideo.muted = true;
@@ -148,6 +148,9 @@ socket.on('alert-message', function(message) {
         document.getElementById('lblCartCount2').style.display = "flex";
         document.getElementById('new-notification').innerHTML = notificationNo;
       }
+
+      var mp3 = '<source src="https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/dl/mp3/samsung-good-news-54001.mp3" type="audio/mpeg">';
+				document.getElementById("sound").innerHTML = '<audio autoplay="autoplay">' + mp3 + "</audio>";
 
     const html = Mustache.render(notificationTemplate, {
         message
