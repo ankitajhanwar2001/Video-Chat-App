@@ -44,7 +44,7 @@ const peers = {};
 const myPeer = new Peer(undefined, {
     path: '/peerjs',
     host: '/',
-    port: '443'
+    port: '8080'
 })
 
 var myVideo = document.createElement('video');

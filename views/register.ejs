@@ -1,88 +1,4 @@
 
-
-<!-- <link rel="stylesheet" href="index_style.css"> -->
-
-<!-- <div class="container">
-    <br/>
-    <b id="login-name"><center>Register</center> </b>
-
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3" id="login">
-            <form action="/register" method="POST" enctype="multipart/form-data">
-
-                <div class="form-group">
-                    <label class="user"> FirstName  </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn"> <i class="glyphicon glyphicon-user"></i></span>
-                        <input type="text" class="form-control" name="firstname" placeholder="First Name" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="user"> LastName  </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn"> <i class="glyphicon glyphicon-user"></i></span>
-                        <input type="text" class="form-control" name="lastname" placeholder="Last Name" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="user"> UserName  </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn"> <i class="glyphicon glyphicon-user"></i></span>
-                        <input type="text" class="form-control" name="username" placeholder="username" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="user"> Email  </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn"> <i class="fa fa-envelope-o" aria-hidden="true"></i></span>
-                        <input type="text" class="form-control" name="email" placeholder="Email" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="user"> Image  </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn"> <i class="glyphicon glyphicon-picture"></i></span>
-                        <span class="form-control" id="check" style="width: 80.5%; border-radius: 4px; color: #808080cf;">No file uploaded</span>
-                        <input type="file" id="myImg" name="image" placeholder="Upload an image" value="upload" onchange="Uploaded()" style="width: 75px; padding-top: 5px;">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="user"> Password </label>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="iconn1"> <i class="glyphicon glyphicon-lock"></i></span>
-                        <input type="password" class="form-control" name="password" placeholder="Enter Password" required>
-                    </div>
-                </div>
-
-                <br/>
-                <div class="form-group">
-                    <input type="submit" class="btn btn-success" value="register" style="border-radius:0px;">
-                    <input type="reset" class="btn btn-danger" value="reset" style="border-radius:0px;">
-                </div>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <p>Already have an account?
-                <a href="/login" style="color: white;"> Login </a></p>
-            </form>
-        </div>
-	</div>
-</div> -->
-
-<!-- <script type="text/javascript">
-  function Uploaded() {
-    document.getElementById('check').innerHTML = 'File Uploaded <span class="glyphicon glyphicon-saved"></span>';
-  }
-</script>
-<script src="https://kit.fontawesome.com/c939d0e917.js"></script> -->
-
-
 <link rel="stylesheet" href="index_style.css">
 
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -91,15 +7,14 @@
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
-  <!-- <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!--  ADD FONTS HERE     -->
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script> -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
@@ -236,14 +151,19 @@
                         <label class="user"> Password </label>
                         <div class="input-group">
                             <span class="input-group-addon" id="iconn1"> <i style="padding: 10px;" class="fas fa-lock"></i></span>
-                            <input type="password" class="form-control" name="password" placeholder="Enter Password" required>
+                            <input type="password" id="password" oninput="strength(this)" class="form-control" name="password" placeholder="Enter Password" required>
+                            <span class="input-group-addon" id="iconn1"> <i id="checkIcon" style="padding: 10px; display: none;" class="fas fa-check"></i></span>
                         </div>
+                        <p style="color: red; display: none; float: left; margin-top: 1rem; margin-bottom: 0;" id="warning1"></p>
+                        <p style="color: red; display: none; float: left; margin-top: 0; margin-bottom: 0;" id="warning2"></p>
+                        <p style="color: red; display: none; float: left; margin-top: 0; margin-bottom: 0;" id="warning3"></p>
+                        <p style="color: red; display: none; float: left; margin-top: 0; margin-bottom: 1rem;" id="warning4"></p>
                     </div>
 
                     <br/>
                     <div class="form-group">
                         <input type="submit" class="btn btn-success" value="register" style="border-radius:0px; margin-right: 12px;">
-                        <input type="reset" class="btn btn-danger" value="reset" style="border-radius:0px;">
+                        <input type="reset" onclick="Reset()" class="btn btn-danger" value="reset" style="border-radius:0px;">
                     </div>
                     <br/>
                     <br/>
@@ -262,8 +182,79 @@
     function Uploaded() {
       document.getElementById('check').innerHTML = 'File Uploaded <span class="glyphicon glyphicon-saved"></span>';
     }
+
+    function strength(e) {
+
+      if(hasLowerCase(e.value) && hasUpperCase(e.value) && specialCharacters(e.value) && length(e.value)) {
+          document.getElementById('warning1').style.display = 'none';
+          document.getElementById('warning2').style.display = 'none';
+          document.getElementById('warning3').style.display = 'none';
+          document.getElementById('warning4').style.display = 'none';
+          document.getElementById('checkIcon').style.display = 'block';
+      } else {
+          document.getElementById('checkIcon').style.display = 'none';
+          if(!hasLowerCase(e.value)) {
+            document.getElementById('warning1').style.display = 'block';
+            document.getElementById('warning1').innerHTML = 'Password must contain lowercase letters.';
+          } else {
+            document.getElementById('warning1').style.display = 'none';
+          }
+          if(!hasUpperCase(e.value)) {
+            document.getElementById('warning2').style.display = 'block';
+            document.getElementById('warning2').innerHTML = 'Password must contain uppercase letters.';
+          } else {
+            document.getElementById('warning2').style.display = 'none';
+          }
+          if(!specialCharacters(e.value)) {
+            document.getElementById('warning3').style.display = 'block';
+            document.getElementById('warning3').innerHTML = 'Password must contain special characters(+,-,@,#...).';
+          } else {
+            document.getElementById('warning3').style.display = 'none';
+          }
+          if(!length(e.value)) {
+            document.getElementById('warning4').style.display = 'block';
+            document.getElementById('warning4').innerHTML = 'Password must be of minimum 8 characters.';
+          } else {
+            document.getElementById('warning4').style.display = 'none';
+          }
+      }
+
+      function hasLowerCase(str) {
+          return (/[a-z]/.test(str));
+      }
+
+      function hasUpperCase(str) {
+          return (/[A-Z]/.test(str));
+      }
+
+      function specialCharacters(str) {
+          var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+
+          if(format.test(str)){
+              return true;
+          } else {
+              return false;
+          }
+      }
+
+      function length(str) {
+          if(str.length < 8) {
+            return false;
+          } else {
+            return true;
+          }
+      }
+    }
+
+    function Reset() {
+      document.getElementById('warning1').style.display = 'none';
+      document.getElementById('warning2').style.display = 'none';
+      document.getElementById('warning3').style.display = 'none';
+      document.getElementById('warning4').style.display = 'none';
+      document.getElementById('checkIcon').style.display = 'none';
+    }
+
   </script>
-  <!-- <script src="https://kit.fontawesome.com/c939d0e917.js"></script> -->
 
 </body>
 </html>
