@@ -44,7 +44,7 @@ const peers = {};
 const myPeer = new Peer(undefined, {
     path: '/peerjs',
     host: '/',
-    port: '443'
+    port: '8080'
 })
 
 var myVideo = document.createElement('video');
@@ -89,6 +89,10 @@ navigator.mediaDevices.getUserMedia({
           chatNo = 0;
           document.getElementById('lblCartCount').innerHTML = "";
         }
+
+        var mp3 = '<source src="https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/dl/mp3/samsung-good-news-54001.mp3" type="audio/mpeg">';
+				document.getElementById("sound2").innerHTML = '<audio autoplay="autoplay">' + mp3 + "</audio>";
+
         const html = Mustache.render(messageTemplate, {
             username: message.from,
             message: message.text,
@@ -110,6 +114,12 @@ function leave() {
     socket.emit("user-disconnecting", userID);
     location.href='/';
 }
+
+// socket.on('room-full', function(id) {
+//     console.log(id);
+//     location.href = '/' + id + '/join';
+//     document.getElementById('alertMessage').innerHTML = '<div class="alert alert-danger" role="alert" id="errorMessage">Room is full.</div>';
+// })
 
 socket.on('no-of-participants', function({ room, users }) {
     var size = users.length;
@@ -150,7 +160,7 @@ socket.on('alert-message', function(message) {
       }
 
       var mp3 = '<source src="https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/dl/mp3/samsung-good-news-54001.mp3" type="audio/mpeg">';
-				document.getElementById("sound").innerHTML = '<audio autoplay="autoplay">' + mp3 + "</audio>";
+			document.getElementById("sound1").innerHTML = '<audio autoplay="autoplay">' + mp3 + "</audio>";
 
     const html = Mustache.render(notificationTemplate, {
         message

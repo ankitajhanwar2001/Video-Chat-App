@@ -163,50 +163,9 @@ app.post('/register', function(req, res) {
                   })
               })
            }
-           // res.status(200).send(data.Location)
        })
      }
    })
-
-   //  upload(req, res, (err) => {
-   //    if(err) {
-   //      console.log("Error");
-   //      req.flash("error", "Something went wrong.");
-   //    } else {
-   //      var url;
-   //      if(req.file == undefined) {
-   //        url = 'uploads/no_profile_picture.jpg';
-   //      } else {
-   //        url = `uploads/${req.file.filename}`;
-   //      }
-   //      console.log(req.file);
-   //      var user = {
-   //          firstname: req.body.firstname,
-   //          lastname: req.body.lastname,
-   //          username: req.body.username,
-   //          email: req.body.email,
-   //          profileUrl: url
-   //      }
-   //      var newUser = new User(user);
-   //      User.register(newUser, req.body.password, function(err, user) {
-   //          if(err) {
-   //              console.log("Error");
-   //              if(newUser && newUser.username.length == 0) {
-   //                  req.flash("error", "Invalid username");
-   //              } else if(newUser && req.body.password.length == 0) {
-   //                  req.flash("error", "Invalid password");
-   //              } else {
-   //                  req.flash("error", "A user with the given username is already registered");
-   //              }
-   //              res.redirect('/register');
-   //          }
-   //          passport.authenticate('local')(req, res, function() {
-   //              req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
-   //              res.redirect(`/${user._id}/join`);
-   //          })
-   //      })
-   //    }
-   // })
 })
 
 // LOGIN
@@ -275,8 +234,15 @@ app.get('/:id/joinExisting', middleware.isLoggedIn, function(req, res) {
 
 app.post('/:id/joinExisting', middleware.isLoggedIn, function(req, res) {
     var index = roomFind(req.body.existingRoom);
+    var user = getUserInRoom(req.body.existingRoom);
+    var size = user.length;
     if(index != -1) {
-        res.redirect(`/${req.params.id}/${ req.body.existingRoom }`);
+        if(size == 4) {
+          req.flash("error", "Room is full.");
+          res.redirect(`/${ req.params.id }/joinExisting`);
+        } else {
+          res.redirect(`/${req.params.id}/${ req.body.existingRoom }`);
+        }
     } else {
         req.flash("error", "Room doesn't exist.");
         res.redirect(`/${ req.params.id }/joinExisting`);
@@ -360,6 +326,14 @@ app.get('/:id/:roomId', middleware.isLoggedIn, function (req, res) {
 io.on('connection', function(socket) {
 
     socket.on('join-room', function(roomId, userId, new_username) {
+
+      // const userInRoom = getUserInRoom(roomId);
+      // const size = userInRoom.length;
+      // console.log(size);
+      // if(size >= 1) {
+      //   socket.emit('room-full');
+      // }
+
         var new_user;
         User.find({ username: new_username }, function (err, user) {
           if(err) {
@@ -370,8 +344,8 @@ io.on('connection', function(socket) {
               console.log("Error");
             } else {
 
-            socket.join(roomId);
             socket.join(userId);
+            socket.join(roomId);
 
             const { user } = addUser({
                 id: new_user._id,
