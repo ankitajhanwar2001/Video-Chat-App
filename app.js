@@ -27,6 +27,7 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 const { addUser, updateUser, removeUser, getUser, getUserInRoom, addRoom, removeRoom, roomFind } = require("./models/roomData");
+const { hasLowerCase, hasUpperCase, specialCharacters, length } = require("./models/passwordStrength");
 
 const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ID,
@@ -122,48 +123,90 @@ app.post('/register', function(req, res) {
        console.log("Error");
        req.flash("error", "Something went wrong.");
      } else {
-       console.log(req.file);
+       var fileImage;
+       if(req.file) {
+           let myFile = req.file.originalname.split(".")
+           const fileType = myFile[myFile.length - 1]
 
-       let myFile = req.file.originalname.split(".")
-       const fileType = myFile[myFile.length - 1]
-
-       const params = {
-           Bucket: process.env.AWS_BUCKET_NAME,
-           Key: `${uuidV4()}.${fileType}`,
-           Body: req.file.buffer
-       }
-
-       s3.upload(params, (error, data) => {
-           if(error){
-               res.status(500).send(error)
-           } else {
-             var user = {
-                  firstname: req.body.firstname,
-                  lastname: req.body.lastname,
-                  username: req.body.username,
-                  email: req.body.email,
-                  profileUrl: data.Location
-              }
-              var newUser = new User(user);
-              User.register(newUser, req.body.password, function(err, user) {
-                  if(err) {
-                      console.log("Error");
-                      if(newUser && newUser.username.length == 0) {
-                          req.flash("error", "Invalid username");
-                      } else if(newUser && req.body.password.length == 0) {
-                          req.flash("error", "Invalid password");
-                      } else {
-                          req.flash("error", "A user with the given username is already registered");
-                      }
-                      res.redirect('/register');
-                  }
-                  passport.authenticate('local')(req, res, function() {
-                      req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
-                      res.redirect(`/${user._id}/join`);
-                  })
-              })
+           const params = {
+               Bucket: process.env.AWS_BUCKET_NAME,
+               Key: `${uuidV4()}.${fileType}`,
+               Body: req.file.buffer
            }
-       })
+
+           s3.upload(params, (error, data) => {
+               if(error){
+                   res.status(500).send(error)
+               } else {
+                 var user = {
+                      firstname: req.body.firstname,
+                      lastname: req.body.lastname,
+                      username: req.body.username,
+                      email: req.body.email,
+                      profileUrl: data.Location
+                  }
+                  var newUser = new User(user);
+
+                  if(!hasLowerCase(req.body.password) || !hasUpperCase(req.body.password) || !specialCharacters(req.body.password) || !length(req.body.password)) {
+                    req.flash("error", "Password must contain lowercase, uppercase, special characters and must be of atleast 8 characters.");
+                    res.redirect('/register');
+                  } else {
+                    User.register(newUser, req.body.password, function(err, user) {
+                        if(err) {
+                            console.log("Error");
+                            if(newUser && newUser.username.length == 0) {
+                                req.flash("error", "Invalid username");
+                            } else if(newUser && req.body.password.length == 0) {
+                                req.flash("error", "Invalid password");
+                            } else {
+                                req.flash("error", "A user with the given username is already registered");
+                            }
+                            res.redirect('/register');
+                        }
+                        passport.authenticate('local')(req, res, function() {
+                            req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
+                            res.redirect(`/${user._id}/join`);
+                        })
+                    })
+                  }
+               }
+           })
+
+       } else {
+         fileImage = 'https://profile-video-image-uploads.s3.ap-south-1.amazonaws.com/no_profile_picture.jpg';
+
+         var user = {
+              firstname: req.body.firstname,
+              lastname: req.body.lastname,
+              username: req.body.username,
+              email: req.body.email,
+              profileUrl: fileImage
+          }
+          var newUser = new User(user);
+
+          if(!hasLowerCase(req.body.password) || !hasUpperCase(req.body.password) || !specialCharacters(req.body.password) || !length(req.body.password)) {
+            req.flash("error", "Password must contain lowercase, uppercase, special characters and must be of atleast 8 characters.");
+            res.redirect('/register');
+          } else {
+            User.register(newUser, req.body.password, function(err, user) {
+                if(err) {
+                    console.log("Error");
+                    if(newUser && newUser.username.length == 0) {
+                        req.flash("error", "Invalid username");
+                    } else if(newUser && req.body.password.length == 0) {
+                        req.flash("error", "Invalid password");
+                    } else {
+                        req.flash("error", "A user with the given username is already registered");
+                    }
+                    res.redirect('/register');
+                }
+                passport.authenticate('local')(req, res, function() {
+                    req.flash("success", "Registered successfully!! Welcome to Video Chat App " + user.firstname + " " + user.lastname);
+                    res.redirect(`/${user._id}/join`);
+                })
+            })
+          }
+       }
      }
    })
 })
