@@ -94,14 +94,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-
-// ROUTES
-// var indexRoutes = require('./public/index');
-// var serverRoutes = require('./public/server');
-
-// app.use(indexRoutes);
-// app.use(serverRoutes);
-
 app.use(function(req, res, next) {
     res.locals.newUser = req.user;
     next();
@@ -369,14 +361,6 @@ app.get('/:id/:roomId', middleware.isLoggedIn, function (req, res) {
 io.on('connection', function(socket) {
 
     socket.on('join-room', function(roomId, userId, new_username) {
-
-      // const userInRoom = getUserInRoom(roomId);
-      // const size = userInRoom.length;
-      // console.log(size);
-      // if(size >= 1) {
-      //   socket.emit('room-full');
-      // }
-
         var new_user;
         User.find({ username: new_username }, function (err, user) {
           if(err) {
@@ -410,6 +394,7 @@ io.on('connection', function(socket) {
                     var user = getUser(userId);
                     var name = user.firstname + " " + user.lastname;
                     io.to(roomId).emit('newMessage', generatedMessage(name, message));
+                    socket.broadcast.to(roomId).emit('chat-sound');
                 }
                 callback();
             })

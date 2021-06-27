@@ -76,6 +76,7 @@ navigator.mediaDevices.getUserMedia({
         connectToNewUser(userId, stream);
     })
 })
+
     socket.on('newMessage', function(message) {
         if(mainChat.style.display === "none") {
           document.getElementById('lblCartCount').style.display = 'flex';
@@ -90,9 +91,6 @@ navigator.mediaDevices.getUserMedia({
           document.getElementById('lblCartCount').innerHTML = "";
         }
 
-        var mp3 = '<source src="https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/dl/mp3/samsung-good-news-54001.mp3" type="audio/mpeg">';
-				document.getElementById("sound2").innerHTML = '<audio autoplay="autoplay">' + mp3 + "</audio>";
-
         const html = Mustache.render(messageTemplate, {
             username: message.from,
             message: message.text,
@@ -100,6 +98,11 @@ navigator.mediaDevices.getUserMedia({
         });
         messages.insertAdjacentHTML('beforeend', html); //inserting the rendered message to the upper div.
     });
+
+    socket.on('chat-sound', function() {
+      var mp3 = '<source src="https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/dl/mp3/samsung-good-news-54001.mp3" type="audio/mpeg">';
+      document.getElementById("sound2").innerHTML = '<audio autoplay="autoplay">' + mp3 + "</audio>";
+    })
 
 myPeer.on('open', function(id) {
     socket.emit('join-room', ROOM_ID, id, currentUser);
@@ -114,12 +117,6 @@ function leave() {
     socket.emit("user-disconnecting", userID);
     location.href='/';
 }
-
-// socket.on('room-full', function(id) {
-//     console.log(id);
-//     location.href = '/' + id + '/join';
-//     document.getElementById('alertMessage').innerHTML = '<div class="alert alert-danger" role="alert" id="errorMessage">Room is full.</div>';
-// })
 
 socket.on('no-of-participants', function({ room, users }) {
     var size = users.length;
@@ -266,7 +263,6 @@ function onoffVideo(e) {
 
 function onoffVoice(e) {
     let enabled = myVideoStream.getAudioTracks()[0].enabled;
-    console.log(myVideoStream.getTracks(), myVideoStream.getAudioTracks()[0]);
     if (enabled) {
         e.firstElementChild.classList.value = 'fa fa-microphone-slash';
         myVideo.muted = true;
