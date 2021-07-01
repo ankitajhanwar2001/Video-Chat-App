@@ -76,7 +76,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-mongoose.connect("mongodb+srv://video-chat-app:ankita2001@cluster0.hgets.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",function(res,req){
+mongoose.connect(process.env.DATABASE_LINK,function(res,req){
    console.log("Database Connected");
  });
 mongoose.set('useFindAndModify', false);
